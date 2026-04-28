@@ -1,0 +1,3527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PracticeFusion Documentation Simulator</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: rgba(255, 255, 255, 0.98);
+      --panel-alt: #eef3f7;
+      --text: #13263a;
+      --muted: #66768a;
+      --primary: #2f5e8d;
+      --primary-dark: #1d4368;
+      --accent: #238564;
+      --accent-dark: #19654c;
+      --border: #d9e2ec;
+      --shadow: 0 18px 36px rgba(15, 31, 53, 0.08);
+      --radius: 22px;
+      --body-grad-top: #ffffff;
+      --body-radial-a: rgba(120, 145, 170, 0.12);
+      --body-radial-b: rgba(210, 220, 232, 0.26);
+      --hero-bg: linear-gradient(135deg, #ffffff 0%, #f7fafc 48%, #edf3f8 100%);
+      --hero-text: #13263a;
+      --hero-subtext: rgba(19, 38, 58, 0.78);
+      --hero-tag-bg: rgba(47, 94, 141, 0.08);
+      --hero-tag-border: rgba(47, 94, 141, 0.12);
+      --hero-panel-bg: rgba(255, 255, 255, 0.72);
+      --hero-panel-border: rgba(181, 198, 214, 0.42);
+      --input-bg: #ffffff;
+      --soft-surface: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+      --prompt-surface: linear-gradient(135deg, rgba(47, 94, 141, 0.08) 0%, rgba(235, 241, 247, 0.92) 100%);
+      --prompt-border: rgba(47, 94, 141, 0.12);
+      --empty-surface: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      --danger: #c53d3d;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #0c1522;
+      --panel: rgba(16, 25, 40, 0.94);
+      --panel-alt: #132034;
+      --text: #e8eff8;
+      --muted: #9eb0c4;
+      --primary: #5cb1d6;
+      --primary-dark: #3e8fb3;
+      --accent: #39bf98;
+      --accent-dark: #27a884;
+      --border: #25354c;
+      --shadow: 0 24px 54px rgba(3, 8, 18, 0.46);
+      --body-grad-top: #0f1a2a;
+      --body-radial-a: rgba(92, 177, 214, 0.16);
+      --body-radial-b: rgba(57, 191, 152, 0.12);
+      --hero-bg: linear-gradient(135deg, #12273c 0%, #173952 48%, #19534c 100%);
+      --hero-text: #ffffff;
+      --hero-subtext: rgba(255, 255, 255, 0.9);
+      --hero-tag-bg: rgba(255, 255, 255, 0.12);
+      --hero-tag-border: rgba(255, 255, 255, 0.18);
+      --hero-panel-bg: rgba(255, 255, 255, 0.08);
+      --hero-panel-border: rgba(255, 255, 255, 0.14);
+      --input-bg: #101b2b;
+      --soft-surface: linear-gradient(180deg, #172335 0%, #132031 100%);
+      --prompt-surface: linear-gradient(135deg, rgba(63, 159, 199, 0.22) 0%, rgba(47, 183, 154, 0.2) 100%);
+      --prompt-border: rgba(94, 188, 224, 0.34);
+      --empty-surface: linear-gradient(180deg, #172335 0%, #122033 100%);
+      --danger: #ff7676;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, var(--body-radial-a), transparent 25%),
+        radial-gradient(circle at right center, var(--body-radial-b), transparent 22%),
+        linear-gradient(180deg, var(--body-grad-top) 0%, var(--bg) 100%);
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .app {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 22px 24px 42px;
+    }
+
+    .theme-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 14px;
+    }
+
+    .theme-switcher {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+      box-shadow: none;
+    }
+
+    .theme-btn {
+      min-height: 40px;
+      padding: 9px 15px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid transparent;
+      box-shadow: none;
+      font-size: 0.92rem;
+    }
+
+    .theme-btn.active {
+      background: var(--panel);
+      border-color: var(--border);
+      color: var(--primary-dark);
+    }
+
+    .hero {
+      background: var(--hero-bg);
+      color: var(--hero-text);
+      border-radius: 28px;
+      padding: 34px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      right: -92px;
+      bottom: -132px;
+      border-radius: 50%;
+      background: var(--hero-tag-bg);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2.1fr 0.9fr;
+      gap: 26px;
+      align-items: start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.3rem, 4.4vw, 3.7rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 820px;
+      font-size: 1.04rem;
+      line-height: 1.7;
+      color: var(--hero-subtext);
+    }
+
+    .hero-tags,
+    .button-row,
+    .timer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-tags {
+      margin-top: 18px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: var(--hero-tag-bg);
+      border: 1px solid var(--hero-tag-border);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .hero-panel {
+      background: var(--hero-panel-bg);
+      border: 1px solid var(--hero-panel-border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .hero-panel h2 {
+      margin: 0 0 12px;
+      font-size: 1.08rem;
+    }
+
+    .hero-panel ol {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.7;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.22rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card p.section-note {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .workflow-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .workflow-tile {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .workflow-kicker {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .workflow-tile p {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      min-height: 44px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--panel-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, #3d74aa 100%);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .left-rail,
+    .right-stage {
+      display: grid;
+      gap: 24px;
+      align-content: start;
+    }
+
+    .control-card {
+      min-height: 430px;
+    }
+
+    .timing-card {
+      min-height: 320px;
+    }
+
+    .scenario-card {
+      min-height: 430px;
+    }
+
+    .documentation-card {
+      min-height: 760px;
+    }
+
+    .advanced-layout {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .advanced-left,
+    .advanced-right {
+      display: grid;
+      gap: 24px;
+      align-content: start;
+    }
+
+    .selection-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .selection-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .advanced-builder-shell {
+      display: grid;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .advanced-builder-block {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--soft-surface);
+    }
+
+    .advanced-builder-block h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .advanced-builder-block p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    .advanced-builder-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 2px 0;
+    }
+
+    .selection-note {
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .selected-orders {
+      display: grid;
+      gap: 10px;
+      margin-top: 0;
+    }
+
+    .advanced-stage-card {
+      min-height: 760px;
+    }
+
+    .advanced-stage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .advanced-stage-header h2 {
+      margin: 0 0 6px;
+    }
+
+    .advanced-stage-header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .stage-kicker {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--panel-alt);
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .selected-order {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--soft-surface);
+    }
+
+    .selected-order .index {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--panel-alt);
+      color: var(--primary-dark);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .selected-order .name {
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .selected-order-main {
+      display: grid;
+      gap: 10px;
+    }
+
+    .selected-order-overrides {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .selected-order-overrides label {
+      margin-bottom: 6px;
+      font-size: 0.84rem;
+    }
+
+    .selected-order-overrides input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--input-bg);
+      color: var(--text);
+      font: inherit;
+      padding: 11px 12px;
+    }
+
+    .advanced-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .advanced-order-card {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .advanced-order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .advanced-order-header h3 {
+      margin: 0;
+      font-size: 1.02rem;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
+    }
+
+    .advanced-order-type {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--panel-alt);
+      color: var(--primary-dark);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .advanced-order-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .advanced-order-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: var(--soft-surface);
+      min-height: 86px;
+    }
+
+    .advanced-order-item .label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .advanced-order-item .value {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      hyphens: none;
+    }
+
+    .advanced-presentation-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .advanced-presentation-grid.compact {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .advanced-presentation-grid .advanced-order-card {
+      box-shadow: none;
+      background: var(--soft-surface);
+    }
+
+    .advanced-presentation-grid .advanced-order-header h3 {
+      font-size: 1.8rem;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-card {
+      padding: 14px;
+      border-radius: 18px;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-header {
+      margin-bottom: 8px;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-header h3 {
+      font-size: 1.39rem;
+      line-height: 1.3;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
+    }
+
+    .advanced-presentation-grid .advanced-order-type {
+      font-size: 1.13rem;
+      padding: 9px 13px;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-type {
+      font-size: 0.86rem;
+      padding: 7px 9px;
+    }
+
+    .advanced-presentation-grid .advanced-order-item {
+      min-height: 110px;
+      padding: 18px;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-grid {
+      gap: 8px;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-item {
+      min-height: 72px;
+      padding: 11px;
+      border-radius: 12px;
+    }
+
+    .advanced-presentation-grid .advanced-order-item .label {
+      font-size: 1.1rem;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-item .label {
+      font-size: 0.86rem;
+      margin-bottom: 4px;
+    }
+
+    .advanced-presentation-grid .advanced-order-item .value {
+      font-size: 1.51rem;
+      line-height: 1.5;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      hyphens: none;
+    }
+
+    .advanced-presentation-grid.compact .advanced-order-item .value {
+      font-size: 1.15rem;
+      line-height: 1.38;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      hyphens: none;
+    }
+
+    .results-layout {
+      display: grid;
+      gap: 18px;
+    }
+
+    .advanced-results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .advanced-result-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, var(--panel) 0%, var(--soft-surface) 100%);
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(15, 31, 53, 0.06);
+    }
+
+    .advanced-result-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+
+    .advanced-result-card h3::after {
+      content: "";
+      display: block;
+      width: 44px;
+      height: 2px;
+      margin-top: 10px;
+      border-radius: 999px;
+      background: rgba(47, 94, 141, 0.22);
+    }
+
+    .advanced-result-meta {
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .advanced-result-text {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 15px 16px;
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 0.98rem;
+      line-height: 1.72;
+      white-space: pre-wrap;
+    }
+
+    .advanced-results-presentation {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .advanced-results-presentation .advanced-result-card {
+      box-shadow: none;
+      background: var(--soft-surface);
+      padding: 20px;
+      border-radius: 20px;
+    }
+
+    .advanced-results-presentation .advanced-result-card h3 {
+      font-size: 1.34rem;
+      margin-bottom: 10px;
+    }
+
+    .advanced-results-presentation .advanced-result-meta {
+      font-size: 0.94rem;
+      margin-bottom: 12px;
+    }
+
+    .advanced-results-presentation .advanced-result-text {
+      font-size: 1.06rem;
+      line-height: 1.72;
+      padding: 16px;
+    }
+
+    .results-filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .results-filter-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .section-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin: -4px 0 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    select,
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--input-bg);
+      color: var(--text);
+      font: inherit;
+    }
+
+    select {
+      padding: 15px 16px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(11, 106, 168, 0.12);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 230px;
+      padding: 16px;
+      resize: vertical;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .password-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--soft-surface);
+    }
+
+    .password-row label {
+      margin-bottom: 6px;
+    }
+
+    .password-row input[type="password"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--input-bg);
+      color: var(--text);
+      font: inherit;
+      padding: 13px 14px;
+    }
+
+    .password-row input[type="password"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(11, 106, 168, 0.12);
+    }
+
+    .password-note {
+      margin-top: 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      min-height: 20px;
+    }
+
+    .button-row,
+    .timer-controls,
+    .preset-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button-row {
+      margin-top: 18px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 17px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+      min-height: 46px;
+    }
+
+    .doc-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .doc-actions button {
+      min-height: 46px;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(17, 55, 84, 0.1);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #3d74aa 100%);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #285b89 100%);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--accent) 0%, #2fa17c 100%);
+      color: #fff;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--accent-dark) 0%, #238d78 100%);
+    }
+
+    .btn-neutral {
+      background: var(--panel-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-warn {
+      background: linear-gradient(135deg, #c15454 0%, #d97d52 100%);
+      color: #fff;
+    }
+
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .scenario-banner,
+    .prompt-box {
+      padding: 18px;
+      border-radius: 18px;
+      background: var(--prompt-surface);
+      border: 1px solid var(--prompt-border);
+    }
+
+    .scenario-banner {
+      margin-bottom: 18px;
+      color: var(--primary-dark);
+      font-size: 1.04rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    body[data-theme="dark"] .scenario-banner {
+      color: #eff8ff;
+    }
+
+    .prompt-box {
+      margin-top: 18px;
+    }
+
+    .prompt-box .label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .data-item {
+      background: var(--soft-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      min-height: 96px;
+    }
+
+    .data-item .label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .data-item .value {
+      font-size: 1.08rem;
+      font-weight: 700;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .empty-state {
+      border: 2px dashed var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--empty-surface);
+    }
+
+    .timer-adjustments {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .timer-adjustments button {
+      min-height: 40px;
+      padding: 9px 14px;
+      font-size: 0.92rem;
+    }
+
+    .timers {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .timer-box {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      background: var(--soft-surface);
+      min-width: 0;
+    }
+
+    .timer-box h3 {
+      margin: 0 0 10px;
+      font-size: 1.02rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .time-display {
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      overflow: hidden;
+    }
+
+    .documentation-output {
+      min-height: 230px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: var(--soft-surface);
+      font-size: 1.04rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .evaluation-box {
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: var(--soft-surface);
+    }
+
+    .evaluation-title {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .evaluation-list {
+      margin: 0;
+      padding-left: 22px;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .evaluation-list li.pass {
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    .evaluation-list li.miss {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .evaluation-summary {
+      margin-bottom: 10px;
+      font-weight: 800;
+      color: var(--accent-dark);
+    }
+
+    .status-line {
+      margin-top: 14px;
+      min-height: 24px;
+      font-weight: 700;
+      color: var(--accent-dark);
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .presentation-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      padding: 28px;
+      background: rgba(8, 16, 28, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .presentation-overlay.open {
+      display: block;
+    }
+
+    .presentation-shell {
+      width: min(1400px, 100%);
+      height: 100%;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+    }
+
+    .presentation-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .presentation-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .presentation-inline-clocks {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .presentation-inline-clock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--soft-surface);
+      white-space: nowrap;
+    }
+
+    .presentation-inline-clock .label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .presentation-inline-clock .value {
+      font-size: 1.24rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+    }
+
+    .presentation-inline-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .presentation-inline-controls button {
+      min-height: 38px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+    }
+
+    .presentation-topbar h2 {
+      margin: 0;
+      font-size: 1.7rem;
+      letter-spacing: -0.03em;
+    }
+
+    .presentation-meta {
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .presentation-clocks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .presentation-actions button {
+      min-height: 40px;
+      padding: 9px 14px;
+      font-size: 0.9rem;
+    }
+
+    .presentation-clock {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 22px;
+      background: var(--soft-surface);
+    }
+
+    .presentation-clock-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .presentation-clock-actions button {
+      min-height: 40px;
+      padding: 9px 14px;
+      font-size: 0.92rem;
+    }
+
+    .presentation-clock .label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 1.29rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .presentation-clock .value {
+      font-size: clamp(4.2rem, 7vw, 7.2rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .presentation-body {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 18px;
+      background: var(--soft-surface);
+      overflow: auto;
+    }
+
+    .presentation-body .scenario-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .presentation-body .data-item {
+      min-height: 132px;
+      padding: 22px;
+    }
+
+    .presentation-body .data-item .label {
+      font-size: 1.38rem;
+      margin-bottom: 12px;
+    }
+
+    .presentation-body .data-item .value {
+      font-size: 1.98rem;
+      line-height: 1.5;
+    }
+
+    .documentation-presentation {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      background: var(--soft-surface);
+      overflow: auto;
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1180px) {
+      .hero-grid,
+      .workflow-strip,
+      .dashboard,
+      .advanced-layout,
+      .advanced-grid,
+      .advanced-results-grid,
+      .advanced-results-presentation {
+        grid-template-columns: 1fr;
+      }
+
+      .timing-card {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        padding: 16px 14px 28px;
+      }
+
+      .hero,
+      .card {
+        padding: 20px;
+      }
+
+      .scenario-grid,
+      .timers,
+      .advanced-order-grid,
+      .selection-row {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .doc-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .password-row {
+        grid-template-columns: 1fr;
+      }
+
+      .presentation-overlay {
+        padding: 14px;
+      }
+
+      .presentation-shell {
+        padding: 18px;
+      }
+
+      .presentation-clocks,
+      .presentation-body .scenario-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="theme-bar">
+      <div class="theme-switcher" role="group" aria-label="Theme switcher">
+        <button id="lightThemeBtn" class="theme-btn active" type="button">Light Mode</button>
+        <button id="darkThemeBtn" class="theme-btn" type="button">Dark Mode</button>
+      </div>
+    </div>
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <h1>PracticeFusion Documentation Simulator</h1>
+          <p>An executive-ready training concept for medical assisting documentation practice. The experience is designed to support classroom delivery, consistent charting habits, and faster instructor-led review without adding operational complexity.</p>
+          <div class="hero-tags">
+            <span class="tag">Executive Preview</span>
+            <span class="tag">Instructor Presentation Workflow</span>
+            <span class="tag">Offline Single-File Prototype</span>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <h2>Experience Summary</h2>
+          <ol>
+            <li>Select a route or test category and generate a realistic charting scenario.</li>
+            <li>Guide students through timed documentation using a clean presentation view.</li>
+            <li>Evaluate charting quality and compare against the modeled documentation standard.</li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <div class="tab-bar" role="tablist" aria-label="Training difficulty">
+      <button id="beginnerTabBtn" class="tab-btn active" type="button" role="tab" aria-selected="true">Beginner</button>
+      <button id="advancedTabBtn" class="tab-btn" type="button" role="tab" aria-selected="false">Advanced</button>
+      <button id="advancedResultsTabBtn" class="tab-btn" type="button" role="tab" aria-selected="false">Advanced - Documentation Results</button>
+    </div>
+
+    <section id="beginnerPanel" class="tab-panel active">
+    <section class="workflow-strip">
+      <div class="workflow-tile">
+        <span class="workflow-kicker">Step 1</span>
+        <p>Select a procedure, screening, or injection and generate a realistic charting scenario with consistent documentation inputs.</p>
+      </div>
+      <div class="workflow-tile">
+        <span class="workflow-kicker">Step 2</span>
+        <p>Guide the room through timed documentation with a clean scenario display built for projection and instructor-led pacing.</p>
+      </div>
+      <div class="workflow-tile">
+        <span class="workflow-kicker">Step 3</span>
+        <p>Evaluate student charting against required elements and reveal the model answer for structured review.</p>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <div class="left-rail">
+        <article class="card control-card">
+          <h2>Procedure Control Panel</h2>
+          <p class="section-note">Choose one procedure, project the randomized details, and guide students through a consistent charting sequence.</p>
+
+          <label for="procedureSelect">Procedure, Screening, or Injection</label>
+          <select id="procedureSelect" aria-label="Select a procedure">
+            <optgroup label="Procedures">
+              <option value="Rapid Strep A">Rapid Strep A</option>
+              <option value="Mononucleosis">Mononucleosis</option>
+            </optgroup>
+            <optgroup label="Screening">
+              <option value="PPD">PPD</option>
+            </optgroup>
+            <optgroup label="Injections - Intramuscular Deltoid">
+              <option value="Twinrix">Twinrix</option>
+              <option value="Hep A">Hep A</option>
+              <option value="Hep B">Hep B</option>
+              <option value="Tdap">Tdap</option>
+              <option value="Influenza">Influenza</option>
+              <option value="HPV">HPV</option>
+              <option value="COVID-19">COVID-19</option>
+              <option value="Shingrix">Shingrix</option>
+              <option value="Pediarix">Pediarix</option>
+            </optgroup>
+            <optgroup label="Injections - Subcutaneous">
+              <option value="IPV">IPV</option>
+              <option value="Varicella">Varicella</option>
+              <option value="MMR">MMR</option>
+            </optgroup>
+            <optgroup label="Injections - Intramuscular Gluteal">
+              <option value="Vitamin B-12">Vitamin B-12</option>
+              <option value="Rocephin">Rocephin</option>
+              <option value="Amoxicillin">Amoxicillin</option>
+              <option value="Depo-Provera">Depo-Provera</option>
+              <option value="Penicillin">Penicillin</option>
+            </optgroup>
+          </select>
+
+          <div class="button-row">
+            <button id="generateScenarioBtn" class="btn-primary">Generate Scenario</button>
+            <button id="resetAllBtn" class="btn-warn">Reset All</button>
+          </div>
+        </article>
+
+        <article class="card timing-card">
+          <h2>Timer + Stopwatch</h2>
+          <p class="section-note">Generate the scenario first, then press Start when you want the countdown timer and stopwatch to begin. Use the minute controls to adjust the countdown as needed.</p>
+
+          <div class="timer-adjustments">
+            <button id="mainMinusMinuteBtn" class="btn-neutral" type="button">-1 min</button>
+            <button id="mainPlusMinuteBtn" class="btn-neutral" type="button">+1 min</button>
+          </div>
+
+          <div class="timers">
+            <div class="timer-box">
+              <h3>Countdown Timer</h3>
+              <div id="countdownDisplay" class="time-display">01:00</div>
+            </div>
+            <div class="timer-box">
+              <h3>Stopwatch</h3>
+              <div id="stopwatchDisplay" class="time-display">00:00</div>
+            </div>
+          </div>
+
+        <div class="timer-controls">
+          <button id="startBtn" class="btn-primary">Start</button>
+          <button id="pauseBtn" class="btn-neutral">Pause</button>
+          <button id="resumeBtn" class="btn-secondary">Resume</button>
+          <button id="resetClocksBtn" class="btn-neutral">Reset Clocks</button>
+        </div>
+
+          <div id="clockStatus" class="status-line"></div>
+        </article>
+      </div>
+
+      <div class="right-stage">
+        <article class="card scenario-card">
+          <h2>Classroom Scenario Display</h2>
+          <p class="section-note">Use these generated details to drive live discussion and student charting. All lot and expiration formats follow the required rules.</p>
+          <div class="section-actions">
+            <button id="openPresentationBtn" class="btn-neutral" type="button">Enlarge Scenario Display</button>
+          </div>
+          <div id="scenarioContent" class="empty-state">
+            Scenario details will appear here after you click <strong>Generate Scenario</strong>.
+          </div>
+          <div class="prompt-box">
+            <span class="label">Instructor Prompt</span>
+            <div id="instructorPrompt">Generate a scenario, ask students to document the procedure independently, then reveal the correct charting format for comparison.</div>
+          </div>
+        </article>
+
+        <article class="card documentation-card">
+          <h2>Student Practice + Model Answer</h2>
+          <p class="section-note">Use the workspace below for live examples, typed student responses, or instructor demonstration notes before revealing the correct charting.</p>
+
+          <label for="studentNotes">Student Documentation Workspace</label>
+          <textarea id="studentNotes" placeholder="Type a sample student response, collect class ideas, or paste documentation for comparison."></textarea>
+
+          <div class="button-row doc-actions">
+            <button id="evaluateDocumentationBtn" class="btn-neutral" disabled>Evaluate Student Documentation</button>
+            <button id="generateDocumentationBtn" class="btn-primary" disabled>Generate Correct Documentation</button>
+            <button id="copyDocumentationBtn" class="btn-secondary" disabled>Copy Documentation</button>
+          </div>
+
+          <div class="password-row">
+            <div>
+              <label for="copyPasswordInput">Copy Documentation Password</label>
+              <input id="copyPasswordInput" type="password" placeholder="Enter password to unlock copying">
+              <div id="copyPasswordStatus" class="password-note">Copying requires the instructor password.</div>
+            </div>
+            <button id="unlockCopyBtn" class="btn-neutral" type="button">Unlock Copy</button>
+          </div>
+
+          <div id="evaluationOutput" class="evaluation-box">
+            <div class="evaluation-title">Documentation Checklist</div>
+            <div id="evaluationContent">Generate a scenario and enter student documentation to evaluate whether the key charting elements are present.</div>
+          </div>
+
+          <div class="section-actions" style="margin-top: 20px;">
+            <button id="openDocumentationPresentationBtn" class="btn-neutral" type="button">Enlarge Correct Documentation</button>
+          </div>
+          <label for="documentationOutput">Correct Documentation</label>
+          <div id="documentationOutput" class="documentation-output">Correct charting will appear here after a scenario is generated and you click the button above.</div>
+          <div id="copyStatus" class="footer-note"></div>
+        </article>
+      </div>
+    </section>
+    </section>
+
+    <section id="advancedPanel" class="tab-panel">
+      <section class="workflow-strip">
+        <div class="workflow-tile">
+          <span class="workflow-kicker">Step 1</span>
+          <p>Select the competency and load the premade doctor's orders set for advanced charting practice.</p>
+        </div>
+        <div class="workflow-tile">
+          <span class="workflow-kicker">Step 2</span>
+          <p>Review the randomized orders, adjust any lot or expiration overrides, and generate the advanced set.</p>
+        </div>
+        <div class="workflow-tile">
+          <span class="workflow-kicker">Step 3</span>
+          <p>Display all generated order details together for advanced charting practice and instructor-led review.</p>
+        </div>
+      </section>
+
+      <section class="advanced-layout">
+        <div class="advanced-left">
+          <article class="card">
+            <h2>Advanced Doctor's Orders Builder</h2>
+            <p class="section-note">Choose the competency, load the premade order set, and then generate the advanced scenario details students will document.</p>
+
+            <div class="advanced-builder-shell">
+              <section class="advanced-builder-block">
+                <h3>Preset Competency Sets</h3>
+                <p>Load a premade doctor's orders sequence as a faster instructor shortcut for competency practice.</p>
+                <div class="selection-stack">
+                  <div class="selection-row">
+                    <div>
+                      <label for="advancedCompetencySelect">Competency</label>
+                      <select id="advancedCompetencySelect" aria-label="Select an advanced competency">
+                        <option value="MA106">MA106 Competency</option>
+                        <option value="MA107">MA107 Competency</option>
+                      </select>
+                    </div>
+                    <button id="loadAdvancedCompetencyBtn" class="btn-primary" type="button">Load Doctor's Orders</button>
+                  </div>
+                  <div class="selection-note">MA106: IM deltoid, SQ, ID PPD, IM glute. MA107: Rapid Strep A, Mononucleosis, IM deltoid, SQ, ID PPD.</div>
+                </div>
+              </section>
+
+              <div class="advanced-builder-divider"></div>
+
+              <section class="advanced-builder-block">
+                <h3>Custom Order Builder</h3>
+                <p>Manually add procedures, screenings, or injections to build a custom advanced charting sequence.</p>
+                <div class="selection-stack">
+                  <div class="selection-row">
+                    <div>
+                      <label for="advancedProcedureSelect">Manually Add Procedure, Screening, or Injection</label>
+                      <select id="advancedProcedureSelect" aria-label="Select an advanced procedure">
+                        <optgroup label="Procedures">
+                          <option value="Rapid Strep A">Rapid Strep A</option>
+                          <option value="Mononucleosis">Mononucleosis</option>
+                        </optgroup>
+                        <optgroup label="Screening">
+                          <option value="PPD">PPD</option>
+                        </optgroup>
+                        <optgroup label="Injections - Intramuscular Deltoid">
+                          <option value="Twinrix">Twinrix</option>
+                          <option value="Hep A">Hep A</option>
+                          <option value="Hep B">Hep B</option>
+                          <option value="Tdap">Tdap</option>
+                          <option value="Influenza">Influenza</option>
+                          <option value="HPV">HPV</option>
+                          <option value="COVID-19">COVID-19</option>
+                          <option value="Shingrix">Shingrix</option>
+                          <option value="Pediarix">Pediarix</option>
+                        </optgroup>
+                        <optgroup label="Injections - Subcutaneous">
+                          <option value="IPV">IPV</option>
+                          <option value="Varicella">Varicella</option>
+                          <option value="MMR">MMR</option>
+                        </optgroup>
+                        <optgroup label="Injections - Intramuscular Gluteal">
+                          <option value="Vitamin B-12">Vitamin B-12</option>
+                          <option value="Rocephin">Rocephin</option>
+                          <option value="Amoxicillin">Amoxicillin</option>
+                          <option value="Depo-Provera">Depo-Provera</option>
+                          <option value="Penicillin">Penicillin</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                    <button id="resetAdvancedBuilderBtn" class="btn-neutral" type="button">Reset Builder</button>
+                    <button id="addAdvancedOrderBtn" class="btn-neutral" type="button">Add Custom Order</button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="advanced-builder-block">
+                <h3>Current Doctor's Orders</h3>
+                <p>Review the order queue below. You can edit lot and expiration values before generating the final advanced set.</p>
+                <div id="selectedAdvancedOrders" class="selected-orders">
+                  <div class="empty-state">No doctor's orders loaded yet. Select a competency and load the premade order set, or add a custom order.</div>
+                </div>
+              </section>
+            </div>
+
+            <div class="button-row">
+              <button id="generateAdvancedOrdersBtn" class="btn-primary" type="button">Generate Advanced Set</button>
+              <button id="clearAdvancedOrdersBtn" class="btn-warn" type="button">Clear Advanced Set</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="advanced-right">
+          <article class="card advanced-stage-card">
+            <div class="advanced-stage-header">
+              <div>
+                <div class="stage-kicker">Presentation Stage</div>
+                <h2>Advanced Documentation Scenario Set</h2>
+                <p>Display the doctor’s orders in a cleaner classroom view so students can organize multi-order charting accurately.</p>
+              </div>
+              <div class="section-actions">
+                <button id="openAdvancedPresentationBtn" class="btn-neutral" type="button">Enlarge Advanced Orders</button>
+              </div>
+            </div>
+
+            <div id="advancedOrdersOutput" class="empty-state">
+              Generate an advanced set to display up to six charting orders for students.
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <section id="advancedResultsPanel" class="tab-panel">
+      <section class="workflow-strip">
+        <div class="workflow-tile">
+          <span class="workflow-kicker">Reference 1</span>
+          <p>Generate the advanced order set first so this tab can import the same scenario details and timestamps.</p>
+        </div>
+        <div class="workflow-tile">
+          <span class="workflow-kicker">Reference 2</span>
+          <p>Use the documentation examples below as a comparison sheet after students finish their own charting.</p>
+        </div>
+        <div class="workflow-tile">
+          <span class="workflow-kicker">Reference 3</span>
+          <p>Each order keeps the same generated lot, expiration date, site, route, and result information from the advanced tab.</p>
+        </div>
+      </section>
+
+      <section class="results-layout">
+        <article class="card">
+          <div class="advanced-stage-header">
+            <div>
+              <div class="stage-kicker">Answer Key</div>
+              <h2>Advanced Documentation Results</h2>
+              <p class="section-note">Use this tab as the instructor reference sheet. It mirrors the most recently generated advanced order set and presents the model charting statements in a cleaner comparison format.</p>
+            </div>
+          </div>
+          <div class="results-filter-bar">
+            <button id="advancedResultsAllBtn" class="btn-neutral results-filter-btn active" type="button">All Results</button>
+            <button id="advancedResultsCarePlanBtn" class="btn-neutral results-filter-btn" type="button">Care Plan Only</button>
+            <button id="advancedResultsImmunizationBtn" class="btn-neutral results-filter-btn" type="button">Immunization Only</button>
+          </div>
+          <div class="section-actions">
+            <button id="openAdvancedResultsPresentationBtn" class="btn-neutral" type="button">Enlarge Documentation Results</button>
+            <button id="openAdvancedResultsPrintPreviewBtn" class="btn-neutral" type="button">Print Preview</button>
+          </div>
+          <div id="advancedResultsOutput" class="empty-state">Generate an advanced set to populate the documentation results reference tab.</div>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <div id="presentationOverlay" class="presentation-overlay" aria-hidden="true">
+    <div class="presentation-shell">
+      <div class="presentation-topbar">
+        <div>
+          <h2>Classroom Scenario Display</h2>
+          <div class="presentation-meta">Presentation view for projection and instructor-led review.</div>
+        </div>
+        <div class="presentation-actions">
+          <button id="presentationStartBtn" class="btn-primary" type="button">Start</button>
+          <button id="presentationPauseBtn" class="btn-neutral" type="button">Pause</button>
+          <button id="presentationResumeBtn" class="btn-secondary" type="button">Resume</button>
+          <button id="presentationResetBtn" class="btn-neutral" type="button">Reset Clocks</button>
+          <button id="closePresentationBtn" class="btn-neutral" type="button">Close</button>
+        </div>
+      </div>
+
+      <div class="presentation-clocks">
+        <div class="presentation-clock">
+          <span class="label">Countdown Timer</span>
+          <div id="presentationCountdown" class="value">01:00</div>
+          <div class="presentation-clock-actions">
+            <button id="presentationMinusMinuteBtn" class="btn-neutral" type="button">-1 min</button>
+            <button id="presentationPlusMinuteBtn" class="btn-neutral" type="button">+1 min</button>
+          </div>
+        </div>
+        <div class="presentation-clock">
+          <span class="label">Stopwatch</span>
+          <div id="presentationStopwatch" class="value">00:00</div>
+        </div>
+      </div>
+
+      <div id="presentationScenario" class="presentation-body">
+        <div class="empty-state">Generate a scenario to display it in presentation view.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="documentationPresentationOverlay" class="presentation-overlay" aria-hidden="true">
+    <div class="presentation-shell">
+      <div class="presentation-topbar">
+        <div>
+          <h2>Correct Documentation</h2>
+          <div class="presentation-meta">Presentation view for instructor-led review and timed copy-down practice.</div>
+        </div>
+        <div class="presentation-actions">
+          <button id="documentationPresentationStartBtn" class="btn-primary" type="button">Start</button>
+          <button id="documentationPresentationPauseBtn" class="btn-neutral" type="button">Pause</button>
+          <button id="documentationPresentationResumeBtn" class="btn-secondary" type="button">Resume</button>
+          <button id="documentationPresentationResetBtn" class="btn-neutral" type="button">Reset Clocks</button>
+          <button id="closeDocumentationPresentationBtn" class="btn-neutral" type="button">Close</button>
+        </div>
+      </div>
+
+      <div class="presentation-clocks">
+        <div class="presentation-clock">
+          <span class="label">Countdown Timer</span>
+          <div id="documentationPresentationCountdown" class="value">01:00</div>
+          <div class="presentation-clock-actions">
+            <button id="documentationPresentationMinusMinuteBtn" class="btn-neutral" type="button">-1 min</button>
+            <button id="documentationPresentationPlusMinuteBtn" class="btn-neutral" type="button">+1 min</button>
+          </div>
+        </div>
+        <div class="presentation-clock">
+          <span class="label">Stopwatch</span>
+          <div id="documentationPresentationStopwatch" class="value">00:00</div>
+        </div>
+      </div>
+
+      <div id="documentationPresentationBody" class="documentation-presentation">Generate correct documentation to display it in presentation view.</div>
+    </div>
+  </div>
+
+  <div id="advancedPresentationOverlay" class="presentation-overlay" aria-hidden="true">
+    <div class="presentation-shell">
+      <div class="presentation-topbar">
+        <div>
+          <h2>Advanced Order Set</h2>
+          <div class="presentation-meta">Presentation view for displaying multiple documentation orders cleanly for students.</div>
+        </div>
+        <div class="presentation-actions">
+          <div class="presentation-inline-clocks">
+            <div class="presentation-inline-clock">
+              <span class="label">Timer</span>
+              <span id="advancedPresentationCountdown" class="value">05:00</span>
+            </div>
+            <div class="presentation-inline-clock">
+              <span class="label">Stopwatch</span>
+              <span id="advancedPresentationStopwatch" class="value">00:00</span>
+            </div>
+            <div class="presentation-inline-controls">
+              <button id="advancedPresentationStopwatchMinusBtn" class="btn-neutral" type="button">-1 min</button>
+              <button id="advancedPresentationStopwatchPlusBtn" class="btn-neutral" type="button">+1 min</button>
+            </div>
+          </div>
+          <div class="presentation-inline-controls">
+            <button id="advancedPresentationStartBtn" class="btn-primary" type="button">Start</button>
+            <button id="advancedPresentationPauseBtn" class="btn-neutral" type="button">Pause</button>
+            <button id="advancedPresentationResumeBtn" class="btn-secondary" type="button">Resume</button>
+            <button id="advancedPresentationResetBtn" class="btn-neutral" type="button">Reset Clocks</button>
+          </div>
+          <button id="openAdvancedPrintPreviewBtn" class="btn-neutral" type="button">Print Preview</button>
+          <button id="closeAdvancedPresentationBtn" class="btn-neutral" type="button">Close</button>
+        </div>
+      </div>
+
+      <div id="advancedPresentationBody" class="presentation-body">
+        <div class="empty-state">Generate an advanced set to display it in presentation view.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="advancedResultsPresentationOverlay" class="presentation-overlay" aria-hidden="true">
+    <div class="presentation-shell">
+      <div class="presentation-topbar">
+        <div>
+          <h2>Advanced Documentation Results</h2>
+          <div class="presentation-meta">Presentation view for displaying the advanced model documentation set for student comparison.</div>
+        </div>
+        <div class="presentation-actions">
+          <div class="presentation-inline-clocks">
+            <div class="presentation-inline-clock">
+              <span class="label">Timer</span>
+              <span id="advancedResultsPresentationCountdown" class="value">05:00</span>
+            </div>
+            <div class="presentation-inline-clock">
+              <span class="label">Stopwatch</span>
+              <span id="advancedResultsPresentationStopwatch" class="value">00:00</span>
+            </div>
+            <div class="presentation-inline-controls">
+              <button id="advancedResultsPresentationStopwatchMinusBtn" class="btn-neutral" type="button">-1 min</button>
+              <button id="advancedResultsPresentationStopwatchPlusBtn" class="btn-neutral" type="button">+1 min</button>
+            </div>
+          </div>
+          <div class="presentation-inline-controls">
+            <button id="advancedResultsPresentationStartBtn" class="btn-primary" type="button">Start</button>
+            <button id="advancedResultsPresentationPauseBtn" class="btn-neutral" type="button">Pause</button>
+            <button id="advancedResultsPresentationResumeBtn" class="btn-secondary" type="button">Resume</button>
+            <button id="advancedResultsPresentationResetBtn" class="btn-neutral" type="button">Reset Clocks</button>
+          </div>
+          <button id="closeAdvancedResultsPresentationBtn" class="btn-neutral" type="button">Close</button>
+        </div>
+      </div>
+
+      <div class="results-filter-bar">
+        <button id="advancedResultsPresentationAllBtn" class="btn-neutral results-filter-btn active" type="button">All Results</button>
+        <button id="advancedResultsPresentationCarePlanBtn" class="btn-neutral results-filter-btn" type="button">Care Plan Only</button>
+        <button id="advancedResultsPresentationImmunizationBtn" class="btn-neutral results-filter-btn" type="button">Immunization Only</button>
+      </div>
+
+      <div id="advancedResultsPresentationBody" class="presentation-body">
+        <div class="empty-state">Generate an advanced set to display the documentation results in presentation view.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const procedureSelect = document.getElementById("procedureSelect");
+      const advancedProcedureSelect = document.getElementById("advancedProcedureSelect");
+      const advancedCompetencySelect = document.getElementById("advancedCompetencySelect");
+      const generateScenarioBtn = document.getElementById("generateScenarioBtn");
+      const resetAllBtn = document.getElementById("resetAllBtn");
+      const beginnerTabBtn = document.getElementById("beginnerTabBtn");
+      const advancedTabBtn = document.getElementById("advancedTabBtn");
+      const advancedResultsTabBtn = document.getElementById("advancedResultsTabBtn");
+      const beginnerPanel = document.getElementById("beginnerPanel");
+      const advancedPanel = document.getElementById("advancedPanel");
+      const advancedResultsPanel = document.getElementById("advancedResultsPanel");
+      const addAdvancedOrderBtn = document.getElementById("addAdvancedOrderBtn");
+      const loadAdvancedCompetencyBtn = document.getElementById("loadAdvancedCompetencyBtn");
+      const resetAdvancedBuilderBtn = document.getElementById("resetAdvancedBuilderBtn");
+      const generateAdvancedOrdersBtn = document.getElementById("generateAdvancedOrdersBtn");
+      const clearAdvancedOrdersBtn = document.getElementById("clearAdvancedOrdersBtn");
+      const openAdvancedPresentationBtn = document.getElementById("openAdvancedPresentationBtn");
+      const openAdvancedPrintPreviewBtn = document.getElementById("openAdvancedPrintPreviewBtn");
+      const openAdvancedResultsPresentationBtn = document.getElementById("openAdvancedResultsPresentationBtn");
+      const openAdvancedResultsPrintPreviewBtn = document.getElementById("openAdvancedResultsPrintPreviewBtn");
+      const closeAdvancedPresentationBtn = document.getElementById("closeAdvancedPresentationBtn");
+      const closeAdvancedResultsPresentationBtn = document.getElementById("closeAdvancedResultsPresentationBtn");
+      const advancedPresentationStartBtn = document.getElementById("advancedPresentationStartBtn");
+      const advancedPresentationPauseBtn = document.getElementById("advancedPresentationPauseBtn");
+      const advancedPresentationResumeBtn = document.getElementById("advancedPresentationResumeBtn");
+      const advancedPresentationResetBtn = document.getElementById("advancedPresentationResetBtn");
+      const advancedPresentationStopwatchMinusBtn = document.getElementById("advancedPresentationStopwatchMinusBtn");
+      const advancedPresentationStopwatchPlusBtn = document.getElementById("advancedPresentationStopwatchPlusBtn");
+      const advancedResultsPresentationStartBtn = document.getElementById("advancedResultsPresentationStartBtn");
+      const advancedResultsPresentationPauseBtn = document.getElementById("advancedResultsPresentationPauseBtn");
+      const advancedResultsPresentationResumeBtn = document.getElementById("advancedResultsPresentationResumeBtn");
+      const advancedResultsPresentationResetBtn = document.getElementById("advancedResultsPresentationResetBtn");
+      const advancedResultsPresentationStopwatchMinusBtn = document.getElementById("advancedResultsPresentationStopwatchMinusBtn");
+      const advancedResultsPresentationStopwatchPlusBtn = document.getElementById("advancedResultsPresentationStopwatchPlusBtn");
+      const selectedAdvancedOrders = document.getElementById("selectedAdvancedOrders");
+      const advancedOrdersOutput = document.getElementById("advancedOrdersOutput");
+      const advancedResultsAllBtn = document.getElementById("advancedResultsAllBtn");
+      const advancedResultsCarePlanBtn = document.getElementById("advancedResultsCarePlanBtn");
+      const advancedResultsImmunizationBtn = document.getElementById("advancedResultsImmunizationBtn");
+      const advancedResultsPresentationAllBtn = document.getElementById("advancedResultsPresentationAllBtn");
+      const advancedResultsPresentationCarePlanBtn = document.getElementById("advancedResultsPresentationCarePlanBtn");
+      const advancedResultsPresentationImmunizationBtn = document.getElementById("advancedResultsPresentationImmunizationBtn");
+      const advancedResultsOutput = document.getElementById("advancedResultsOutput");
+      const advancedResultsPresentationOverlay = document.getElementById("advancedResultsPresentationOverlay");
+      const advancedResultsPresentationBody = document.getElementById("advancedResultsPresentationBody");
+      const advancedResultsPresentationCountdown = document.getElementById("advancedResultsPresentationCountdown");
+      const advancedResultsPresentationStopwatch = document.getElementById("advancedResultsPresentationStopwatch");
+      const lightThemeBtn = document.getElementById("lightThemeBtn");
+      const darkThemeBtn = document.getElementById("darkThemeBtn");
+      const openPresentationBtn = document.getElementById("openPresentationBtn");
+      const openDocumentationPresentationBtn = document.getElementById("openDocumentationPresentationBtn");
+      const closePresentationBtn = document.getElementById("closePresentationBtn");
+      const presentationStartBtn = document.getElementById("presentationStartBtn");
+      const presentationPauseBtn = document.getElementById("presentationPauseBtn");
+      const presentationResumeBtn = document.getElementById("presentationResumeBtn");
+      const presentationResetBtn = document.getElementById("presentationResetBtn");
+      const presentationMinusMinuteBtn = document.getElementById("presentationMinusMinuteBtn");
+      const presentationPlusMinuteBtn = document.getElementById("presentationPlusMinuteBtn");
+      const presentationOverlay = document.getElementById("presentationOverlay");
+      const presentationCountdown = document.getElementById("presentationCountdown");
+      const presentationStopwatch = document.getElementById("presentationStopwatch");
+      const presentationScenario = document.getElementById("presentationScenario");
+      const documentationPresentationOverlay = document.getElementById("documentationPresentationOverlay");
+      const closeDocumentationPresentationBtn = document.getElementById("closeDocumentationPresentationBtn");
+      const documentationPresentationStartBtn = document.getElementById("documentationPresentationStartBtn");
+      const documentationPresentationPauseBtn = document.getElementById("documentationPresentationPauseBtn");
+      const documentationPresentationResumeBtn = document.getElementById("documentationPresentationResumeBtn");
+      const documentationPresentationResetBtn = document.getElementById("documentationPresentationResetBtn");
+      const documentationPresentationMinusMinuteBtn = document.getElementById("documentationPresentationMinusMinuteBtn");
+      const documentationPresentationPlusMinuteBtn = document.getElementById("documentationPresentationPlusMinuteBtn");
+      const documentationPresentationCountdown = document.getElementById("documentationPresentationCountdown");
+      const documentationPresentationStopwatch = document.getElementById("documentationPresentationStopwatch");
+      const documentationPresentationBody = document.getElementById("documentationPresentationBody");
+      const advancedPresentationOverlay = document.getElementById("advancedPresentationOverlay");
+      const advancedPresentationBody = document.getElementById("advancedPresentationBody");
+      const advancedPresentationCountdown = document.getElementById("advancedPresentationCountdown");
+      const advancedPresentationStopwatch = document.getElementById("advancedPresentationStopwatch");
+      const mainMinusMinuteBtn = document.getElementById("mainMinusMinuteBtn");
+      const mainPlusMinuteBtn = document.getElementById("mainPlusMinuteBtn");
+      const scenarioContent = document.getElementById("scenarioContent");
+      const instructorPrompt = document.getElementById("instructorPrompt");
+      const evaluateDocumentationBtn = document.getElementById("evaluateDocumentationBtn");
+      const generateDocumentationBtn = document.getElementById("generateDocumentationBtn");
+      const copyDocumentationBtn = document.getElementById("copyDocumentationBtn");
+      const copyPasswordInput = document.getElementById("copyPasswordInput");
+      const copyPasswordStatus = document.getElementById("copyPasswordStatus");
+      const unlockCopyBtn = document.getElementById("unlockCopyBtn");
+      const documentationOutput = document.getElementById("documentationOutput");
+      const evaluationContent = document.getElementById("evaluationContent");
+      const studentNotes = document.getElementById("studentNotes");
+      const copyStatus = document.getElementById("copyStatus");
+      const countdownDisplay = document.getElementById("countdownDisplay");
+      const stopwatchDisplay = document.getElementById("stopwatchDisplay");
+      const startBtn = document.getElementById("startBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const resumeBtn = document.getElementById("resumeBtn");
+      const resetClocksBtn = document.getElementById("resetClocksBtn");
+      const clockStatus = document.getElementById("clockStatus");
+
+      function createImGlutealProcedure(medication, volume) {
+        return {
+          prompt: `Ask students to chart IM ${medication}, the exact gluteal site, patient tolerance, observation time, and aftercare understanding.`,
+          buildLot: createInjectionLot,
+          getScenario: function () {
+            const site = randomChoice(["L gluteal", "R gluteal"]);
+            return {
+              category: "Injection",
+              route: "IM",
+              site: site,
+              dose: volume,
+              result: "N/A",
+              checklist: [
+                { label: "Date included", match: ["date"] },
+                { label: "Time included", match: ["time"] },
+                { label: "IM route documented", match: ["im"] },
+                { label: `${medication} documented`, match: [medication.toLowerCase()] },
+                { label: `${volume} documented`, match: [volume.toLowerCase()] },
+                { label: "Correct site documented", match: [site.toLowerCase()] },
+                { label: "Patient tolerance documented", match: ["tolerated", "procedure well"] },
+                { label: "No complications documented", match: ["no complications"] },
+                { label: "20-minute wait documented", match: ["20 minutes"] },
+                { label: "No reaction documented", match: ["no reaction"] },
+                { label: "Aftercare understanding documented", match: ["understanding of aftercare", "verbalized understanding"] }
+              ],
+              documentation: ({ date, time, lotExp }) =>
+                `${date}, ${time} administered IM ${medication} ${volume} (${lotExp}) onto ${site}. Pt tolerated the procedure well, no complications. Pt waited 20 minutes in the waiting room, no reaction. Pt verbalized understanding of aftercare.`
+            };
+          }
+        };
+      }
+
+      function createImDeltoidProcedure(medication, volume) {
+        return {
+          prompt: `Ask students to chart IM ${medication}, the exact deltoid site, patient tolerance, observation time, and aftercare understanding.`,
+          buildLot: createInjectionLot,
+          getScenario: function () {
+            const site = randomChoice(["L deltoid", "R deltoid"]);
+            return {
+              category: "Injection",
+              route: "IM",
+              site: site,
+              dose: volume,
+              result: "N/A",
+              checklist: [
+                { label: "Date included", match: ["date"] },
+                { label: "Time included", match: ["time"] },
+                { label: "IM route documented", match: ["im"] },
+                { label: `${medication} documented`, match: [medication.toLowerCase()] },
+                { label: `${volume} documented`, match: [volume.toLowerCase()] },
+                { label: "Correct site documented", match: [site.toLowerCase()] },
+                { label: "Patient tolerance documented", match: ["tolerated", "procedure well"] },
+                { label: "No complications documented", match: ["no complications"] },
+                { label: "20-minute wait documented", match: ["20 minutes"] },
+                { label: "No reaction documented", match: ["no reaction"] },
+                { label: "Aftercare understanding documented", match: ["understanding of aftercare", "verbalized understanding"] }
+              ],
+              documentation: ({ date, time, lotExp }) =>
+                `${date}, ${time} administered IM ${medication} ${volume} (${lotExp}) onto ${site}. Pt tolerated the procedure well, no complications. Pt waited 20 minutes in the waiting room, no reaction. Pt verbalized understanding of aftercare.`
+            };
+          }
+        };
+      }
+
+      function createSubcutaneousProcedure(medication, volume) {
+        return {
+          prompt: `Ask students to chart SubQ ${medication}, the exact site, patient tolerance, observation time, and aftercare understanding.`,
+          buildLot: createInjectionLot,
+          getScenario: function () {
+            const site = randomChoice(["L arm", "R arm"]);
+            return {
+              category: "Injection",
+              route: "SQ",
+              site: site,
+              dose: volume,
+              result: "N/A",
+              checklist: [
+                { label: "Date included", match: ["date"] },
+                { label: "Time included", match: ["time"] },
+                { label: "SubQ route documented", match: ["subq"] },
+                { label: `${medication} documented`, match: [medication.toLowerCase()] },
+                { label: `${volume} documented`, match: [volume.toLowerCase()] },
+                { label: "Correct site documented", match: [site.toLowerCase()] },
+                { label: "Patient tolerance documented", match: ["tolerated", "procedure well"] },
+                { label: "No complications documented", match: ["no complications"] },
+                { label: "20-minute wait documented", match: ["20 minutes"] },
+                { label: "No reaction documented", match: ["no reaction"] },
+                { label: "Aftercare understanding documented", match: ["understanding of aftercare", "verbalized understanding"] }
+              ],
+              documentation: ({ date, time, lotExp }) =>
+                `${date}, ${time} administered SubQ ${medication} ${volume} (${lotExp}) onto ${site}. Pt tolerated the procedure well, no complications. Pt waited 20 minutes in the waiting room, no reaction. Pt verbalized understanding of aftercare.`
+            };
+          }
+        };
+      }
+
+      const procedures = {
+        "Rapid Strep A": {
+          site: "N/A",
+          prompt: "Ask students to use the word performed, include the instruction card, and report the result to the provider.",
+          buildLot: createStrepLot,
+          getScenario: function () {
+            const result = randomChoice(["positive", "negative"]);
+            return {
+              category: "Procedure",
+              site: this.site,
+              dose: "N/A",
+              result: capitalize(result),
+              hideDose: true,
+              hideSite: true,
+              checklist: [
+                { label: "Date included", match: ["date"] },
+                { label: "Time included", match: ["time"] },
+                { label: "Rapid Strep A documented", match: ["rapid strep a"] },
+                { label: "Performed documented", match: ["performed"] },
+                { label: "Instruction card documented", match: ["instruction card"] },
+                { label: "Patient tolerance documented", match: ["tolerated", "procedure well"] },
+                { label: "No complications documented", match: ["no complications"] },
+                { label: "Correct result documented", match: [result.toLowerCase()] },
+                { label: "Reported to provider documented", anyMatch: ["reported to the provider", "reported to provider"] }
+              ],
+              documentation: ({ date, time, lotExp }) =>
+                `${date}, ${time} performed Rapid Strep A (${lotExp}) per instruction card. Pt tolerated the procedure well, no complications. Results are ${result} and reported to the provider.`
+            };
+          }
+        },
+        "Mononucleosis": {
+          site: "Capillary puncture site generated",
+          prompt: "Ask students to include the capillary puncture location, instruction card language, patient tolerance, and the reported result.",
+          buildLot: createMonoLot,
+          getScenario: function () {
+            const result = randomChoice(["positive", "negative"]);
+            const finger = randomChoice(["L middle", "L ring", "R middle", "R ring"]);
+            return {
+              category: "Procedure",
+              site: `${finger} finger`,
+              punctureSite: finger,
+              punctureDisplay: `${finger} finger`,
+              dose: "N/A",
+              result: capitalize(result),
+              hideDose: true,
+              hideSite: true,
+              checklist: [
+                { label: "Date included", match: ["date"] },
+                { label: "Time included", match: ["time"] },
+                { label: "Mononucleosis test documented", match: ["mononucleosis"] },
+                { label: "Performed documented", match: ["performed"] },
+                { label: "Instruction card documented", match: ["instruction card"] },
+                { label: "Correct puncture site documented", match: [finger.toLowerCase()] },
+                { label: "Patient tolerance documented", match: ["tolerated", "procedure well"] },
+                { label: "No complications documented", match: ["no complications"] },
+                { label: "Correct result documented", match: [result.toLowerCase()] },
+                { label: "Reported to provider documented", anyMatch: ["reported to the provider", "reported to provider"] }
+              ],
+              documentation: ({ date, time, lotExp }) =>
+                `${date}, ${time} performed Mononucleosis test (${lotExp}) per instruction card. Performed capillary puncture on ${finger} finger. Pt tolerated the procedure well, no complications. Results are ${result} and reported to the provider.`
+            };
+          }
+        },
+        "Twinrix": createImDeltoidProcedure("Twinrix", "0.5 mL"),
+        "Hep A": createImDeltoidProcedure("Hep A", "0.5 mL"),
+        "Hep B": createImDeltoidProcedure("Hep B", "0.5 mL"),
+        "Tdap": createImDeltoidProcedure("Tdap", "0.5 mL"),
+        "Influenza": createImDeltoidProcedure("Influenza", "0.5 mL"),
+        "HPV": createImDeltoidProcedure("HPV", "0.5 mL"),
+        "COVID-19": createImDeltoidProcedure("COVID-19", "0.5 mL"),
+        "Shingrix": createImDeltoidProcedure("Shingrix", "0.5 mL"),
+        "Pediarix": createImDeltoidProcedure("Pediarix", "0.5 mL"),
+        "IPV": createSubcutaneousProcedure("IPV", "0.5 mL"),
+        "Varicella": createSubcutaneousProcedure("Varicella", "0.5 mL"),
+        "MMR": createSubcutaneousProcedure("MMR", "0.5 mL"),
+        "PPD": {
+          site: "R anterior forearm",
+          prompt: "Ask students to include route, medication, exact site, wheal obtained, return timeframe, and aftercare understanding.",
+          buildLot: createInjectionLot,
+          getScenario: function () {
+            return {
+              category: "Screening",
+              route: "ID",
+              site: this.site,
+              dose: "0.1 mL",
+              result: "N/A",
+              checklist: [
+                { label: "Date included", match: ["date"] },
+                { label: "Time included", match: ["time"] },
+                { label: "ID route documented", match: ["id"] },
+                { label: "PPD documented", match: ["ppd"] },
+                { label: "0.1 mL documented", match: ["0.1 ml"] },
+                { label: "Correct site documented", match: ["r anterior forearm"] },
+                { label: "Patient tolerance documented", match: ["tolerated", "procedure well"] },
+                { label: "No complications documented", match: ["no complications"] },
+                { label: "Wheal documented", match: ["wheal"] },
+                { label: "48-72 hour return documented", match: ["48-72", "48–72"] },
+                { label: "Aftercare understanding documented", match: ["understanding of aftercare", "verbalized understanding"] }
+              ],
+              documentation: ({ date, time, lotExp }) =>
+                `${date}, ${time} administered ID PPD 0.1 mL (${lotExp}) onto R anterior forearm. Pt tolerated the procedure well, no complications. Wheal successfully obtained. Pt will return in 48-72 hours to have the TB test read. Pt verbalized understanding of aftercare.`
+            };
+          }
+        },
+        "Vitamin B-12": createImGlutealProcedure("Vitamin B-12", "0.5 mL"),
+        "Rocephin": createImGlutealProcedure("Rocephin", "0.5 mL"),
+        "Amoxicillin": createImGlutealProcedure("Amoxicillin", "0.5 mL"),
+        "Depo-Provera": createImGlutealProcedure("Depo-Provera", "0.5 mL"),
+        "Penicillin": createImGlutealProcedure("Penicillin", "0.5 mL")
+      };
+
+      const imDeltoidProcedures = ["Twinrix", "Hep A", "Hep B", "Tdap", "Influenza", "HPV", "COVID-19", "Shingrix", "Pediarix"];
+      const subcutaneousProcedures = ["IPV", "Varicella", "MMR"];
+      const imGlutealProcedures = ["Vitamin B-12", "Rocephin", "Amoxicillin", "Depo-Provera", "Penicillin"];
+
+      let selectedTimerMinutes = 1;
+      let countdownSeconds = selectedTimerMinutes * 60;
+      let stopwatchSeconds = 0;
+      let clockTicker = null;
+      let countdownRemainingMs = selectedTimerMinutes * 60 * 1000;
+      let stopwatchElapsedMs = 0;
+      let runStartedAtMs = 0;
+      let clocksRunning = false;
+      let currentScenario = null;
+      let copyUnlocked = false;
+      let advancedSelectedProcedures = [];
+      let advancedCountdownSeconds = 300;
+      let advancedStopwatchSeconds = 0;
+      let advancedClockTicker = null;
+      let advancedCountdownRemainingMs = 300000;
+      let advancedStopwatchElapsedMs = 0;
+      let advancedRunStartedAtMs = 0;
+      let advancedClocksRunning = false;
+      let advancedResultsCountdownSeconds = 300;
+      let advancedResultsStopwatchSeconds = 0;
+      let advancedResultsClockTicker = null;
+      let advancedResultsCountdownRemainingMs = 300000;
+      let advancedResultsStopwatchElapsedMs = 0;
+      let advancedResultsRunStartedAtMs = 0;
+      let advancedResultsClocksRunning = false;
+      let currentAdvancedScenarios = [];
+      let advancedResultsFilter = "all";
+      const copyPassword = "123456";
+
+      function setTheme(theme) {
+        document.body.setAttribute("data-theme", theme);
+        lightThemeBtn.classList.toggle("active", theme === "light");
+        darkThemeBtn.classList.toggle("active", theme === "dark");
+      }
+
+      function adjustCountdownByMinutes(deltaMinutes) {
+        if (clocksRunning && runStartedAtMs) {
+          const elapsedMs = Date.now() - runStartedAtMs;
+          stopwatchElapsedMs += elapsedMs;
+          countdownRemainingMs = Math.max(0, countdownRemainingMs - elapsedMs);
+          runStartedAtMs = Date.now();
+        }
+        countdownRemainingMs = Math.max(0, countdownRemainingMs + (deltaMinutes * 60 * 1000));
+        countdownSeconds = countdownRemainingMs > 0 ? Math.ceil(countdownRemainingMs / 1000) : 0;
+        stopwatchSeconds = Math.floor(stopwatchElapsedMs / 1000);
+        selectedTimerMinutes = Math.max(0, Math.ceil(countdownRemainingMs / 60000));
+        updateClockDisplays();
+        if (!clocksRunning) {
+          clockStatus.textContent = `Countdown adjusted to ${formatClock(countdownSeconds)}.`;
+        }
+      }
+
+      function lockCopy() {
+        copyUnlocked = false;
+        copyDocumentationBtn.disabled = true;
+        copyPasswordInput.value = "";
+        copyPasswordStatus.textContent = "Copying requires the instructor password.";
+      }
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function randomChoice(options) {
+        return options[randomInt(0, options.length - 1)];
+      }
+
+      function capitalize(value) {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+      }
+
+      function formatDate(date) {
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+      }
+
+      function formatTime(date) {
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${hours}:${minutes}`;
+      }
+
+      function getScenarioDateTime() {
+        const now = new Date();
+        const randomTime = new Date(now);
+        randomTime.setHours(randomInt(8, 16));
+        randomTime.setMinutes(randomInt(0, 59));
+        randomTime.setSeconds(0);
+        randomTime.setMilliseconds(0);
+        return randomTime;
+      }
+
+      function formatClock(totalSeconds) {
+        const safeSeconds = Math.max(0, totalSeconds);
+        const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, "0");
+        const seconds = String(safeSeconds % 60).padStart(2, "0");
+        return `${minutes}:${seconds}`;
+      }
+
+      function createFutureExpiry(minMonthsAhead, maxMonthsAhead, endOfMonth) {
+        const now = new Date();
+        const monthsAhead = randomInt(minMonthsAhead, maxMonthsAhead);
+        const expiry = new Date(now.getFullYear(), now.getMonth() + monthsAhead + 1, 0);
+
+        if (!endOfMonth) {
+          const maxDay = new Date(expiry.getFullYear(), expiry.getMonth() + 1, 0).getDate();
+          expiry.setDate(Math.min(randomInt(1, maxDay), maxDay));
+        }
+
+        if (expiry <= now) {
+          expiry.setMonth(expiry.getMonth() + 1);
+        }
+
+        return formatDate(expiry);
+      }
+
+      function createInjectionLot() {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const first = letters[randomInt(0, letters.length - 1)];
+        const second = letters[randomInt(0, letters.length - 1)];
+        const digits = String(randomInt(0, 9999)).padStart(4, "0");
+        return {
+          lot: `${first}${second}${digits}`,
+          expiration: createFutureExpiry(2, 18, true)
+        };
+      }
+
+      function createStrepLot() {
+        let lot = "";
+        for (let i = 0; i < 10; i += 1) {
+          lot += String(randomInt(0, 9));
+        }
+        return {
+          lot: lot,
+          expiration: createFutureExpiry(3, 18, false)
+        };
+      }
+
+      function createMonoLot() {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const prefix = String(randomInt(0, 999)).padStart(3, "0");
+        const letter = letters[randomInt(0, letters.length - 1)];
+        const suffix = String(randomInt(0, 99)).padStart(2, "0");
+        return {
+          lot: `${prefix}${letter}${suffix}`,
+          expiration: createFutureExpiry(3, 24, true)
+        };
+      }
+
+      function updateClockDisplays() {
+        countdownDisplay.textContent = formatClock(countdownSeconds);
+        stopwatchDisplay.textContent = formatClock(stopwatchSeconds);
+        presentationCountdown.textContent = formatClock(countdownSeconds);
+        presentationStopwatch.textContent = formatClock(stopwatchSeconds);
+        documentationPresentationCountdown.textContent = formatClock(countdownSeconds);
+        documentationPresentationStopwatch.textContent = formatClock(stopwatchSeconds);
+        advancedPresentationCountdown.textContent = formatClock(advancedCountdownSeconds);
+        advancedPresentationStopwatch.textContent = formatClock(advancedStopwatchSeconds);
+        advancedResultsPresentationCountdown.textContent = formatClock(advancedResultsCountdownSeconds);
+        advancedResultsPresentationStopwatch.textContent = formatClock(advancedResultsStopwatchSeconds);
+      }
+
+      function stopAdvancedIntervals() {
+        clearInterval(advancedClockTicker);
+        advancedClockTicker = null;
+      }
+
+      function tickAdvancedClocks() {
+        if (!advancedClocksRunning || !advancedRunStartedAtMs) {
+          return;
+        }
+
+        const elapsedMs = Date.now() - advancedRunStartedAtMs;
+        const currentStopwatchMs = advancedStopwatchElapsedMs + elapsedMs;
+        const currentCountdownMs = Math.max(0, advancedCountdownRemainingMs - elapsedMs);
+
+        advancedStopwatchSeconds = Math.floor(currentStopwatchMs / 1000);
+        advancedCountdownSeconds = currentCountdownMs > 0 ? Math.ceil(currentCountdownMs / 1000) : 0;
+        updateClockDisplays();
+      }
+
+      function startAdvancedClocks() {
+        stopAdvancedIntervals();
+        advancedClocksRunning = true;
+        advancedRunStartedAtMs = Date.now();
+        tickAdvancedClocks();
+        advancedClockTicker = setInterval(tickAdvancedClocks, 200);
+      }
+
+      function pauseAdvancedClocks() {
+        if (!advancedClocksRunning) {
+          return;
+        }
+        const elapsedMs = Date.now() - advancedRunStartedAtMs;
+        advancedStopwatchElapsedMs += elapsedMs;
+        advancedCountdownRemainingMs = Math.max(0, advancedCountdownRemainingMs - elapsedMs);
+        stopAdvancedIntervals();
+        advancedClocksRunning = false;
+        advancedRunStartedAtMs = 0;
+        advancedCountdownSeconds = advancedCountdownRemainingMs > 0 ? Math.ceil(advancedCountdownRemainingMs / 1000) : 0;
+        advancedStopwatchSeconds = Math.floor(advancedStopwatchElapsedMs / 1000);
+        updateClockDisplays();
+      }
+
+      function resetAdvancedClocks() {
+        stopAdvancedIntervals();
+        advancedClocksRunning = false;
+        advancedRunStartedAtMs = 0;
+        advancedCountdownRemainingMs = 300000;
+        advancedStopwatchElapsedMs = 0;
+        advancedCountdownSeconds = 300;
+        advancedStopwatchSeconds = 0;
+        updateClockDisplays();
+      }
+
+      function adjustAdvancedCountdownByMinutes(deltaMinutes) {
+        if (advancedClocksRunning && advancedRunStartedAtMs) {
+          const elapsedMs = Date.now() - advancedRunStartedAtMs;
+          advancedStopwatchElapsedMs += elapsedMs;
+          advancedCountdownRemainingMs = Math.max(0, advancedCountdownRemainingMs - elapsedMs);
+          advancedRunStartedAtMs = Date.now();
+        }
+        advancedCountdownRemainingMs = Math.max(0, advancedCountdownRemainingMs + (deltaMinutes * 60 * 1000));
+        advancedCountdownSeconds = advancedCountdownRemainingMs > 0 ? Math.ceil(advancedCountdownRemainingMs / 1000) : 0;
+        advancedStopwatchSeconds = Math.floor(advancedStopwatchElapsedMs / 1000);
+        updateClockDisplays();
+      }
+
+      function stopAdvancedResultsIntervals() {
+        clearInterval(advancedResultsClockTicker);
+        advancedResultsClockTicker = null;
+      }
+
+      function tickAdvancedResultsClocks() {
+        if (!advancedResultsClocksRunning || !advancedResultsRunStartedAtMs) {
+          return;
+        }
+
+        const elapsedMs = Date.now() - advancedResultsRunStartedAtMs;
+        const currentStopwatchMs = advancedResultsStopwatchElapsedMs + elapsedMs;
+        const currentCountdownMs = Math.max(0, advancedResultsCountdownRemainingMs - elapsedMs);
+
+        advancedResultsStopwatchSeconds = Math.floor(currentStopwatchMs / 1000);
+        advancedResultsCountdownSeconds = currentCountdownMs > 0 ? Math.ceil(currentCountdownMs / 1000) : 0;
+        updateClockDisplays();
+      }
+
+      function startAdvancedResultsClocks() {
+        stopAdvancedResultsIntervals();
+        advancedResultsClocksRunning = true;
+        advancedResultsRunStartedAtMs = Date.now();
+        tickAdvancedResultsClocks();
+        advancedResultsClockTicker = setInterval(tickAdvancedResultsClocks, 200);
+      }
+
+      function pauseAdvancedResultsClocks() {
+        if (!advancedResultsClocksRunning) {
+          return;
+        }
+        const elapsedMs = Date.now() - advancedResultsRunStartedAtMs;
+        advancedResultsStopwatchElapsedMs += elapsedMs;
+        advancedResultsCountdownRemainingMs = Math.max(0, advancedResultsCountdownRemainingMs - elapsedMs);
+        stopAdvancedResultsIntervals();
+        advancedResultsClocksRunning = false;
+        advancedResultsRunStartedAtMs = 0;
+        advancedResultsCountdownSeconds = advancedResultsCountdownRemainingMs > 0 ? Math.ceil(advancedResultsCountdownRemainingMs / 1000) : 0;
+        advancedResultsStopwatchSeconds = Math.floor(advancedResultsStopwatchElapsedMs / 1000);
+        updateClockDisplays();
+      }
+
+      function resetAdvancedResultsClocks() {
+        stopAdvancedResultsIntervals();
+        advancedResultsClocksRunning = false;
+        advancedResultsRunStartedAtMs = 0;
+        advancedResultsCountdownRemainingMs = 300000;
+        advancedResultsStopwatchElapsedMs = 0;
+        advancedResultsCountdownSeconds = 300;
+        advancedResultsStopwatchSeconds = 0;
+        updateClockDisplays();
+      }
+
+      function adjustAdvancedResultsCountdownByMinutes(deltaMinutes) {
+        if (advancedResultsClocksRunning && advancedResultsRunStartedAtMs) {
+          const elapsedMs = Date.now() - advancedResultsRunStartedAtMs;
+          advancedResultsStopwatchElapsedMs += elapsedMs;
+          advancedResultsCountdownRemainingMs = Math.max(0, advancedResultsCountdownRemainingMs - elapsedMs);
+          advancedResultsRunStartedAtMs = Date.now();
+        }
+        advancedResultsCountdownRemainingMs = Math.max(0, advancedResultsCountdownRemainingMs + (deltaMinutes * 60 * 1000));
+        advancedResultsCountdownSeconds = advancedResultsCountdownRemainingMs > 0 ? Math.ceil(advancedResultsCountdownRemainingMs / 1000) : 0;
+        advancedResultsStopwatchSeconds = Math.floor(advancedResultsStopwatchElapsedMs / 1000);
+        updateClockDisplays();
+      }
+
+      function setActiveTab(tabName) {
+        const beginnerActive = tabName === "beginner";
+        const advancedActive = tabName === "advanced";
+        const advancedResultsActive = tabName === "advanced-results";
+
+        beginnerTabBtn.classList.toggle("active", beginnerActive);
+        advancedTabBtn.classList.toggle("active", advancedActive);
+        advancedResultsTabBtn.classList.toggle("active", advancedResultsActive);
+
+        beginnerTabBtn.setAttribute("aria-selected", String(beginnerActive));
+        advancedTabBtn.setAttribute("aria-selected", String(advancedActive));
+        advancedResultsTabBtn.setAttribute("aria-selected", String(advancedResultsActive));
+
+        beginnerPanel.classList.toggle("active", beginnerActive);
+        advancedPanel.classList.toggle("active", advancedActive);
+        advancedResultsPanel.classList.toggle("active", advancedResultsActive);
+      }
+
+      function createScenarioData(procedureName) {
+        const definition = procedures[procedureName];
+        const scenarioDateTime = getScenarioDateTime();
+        const common = definition.buildLot();
+        const scenarioDefinition = definition.getScenario();
+
+        return {
+          procedure: procedureName,
+          category: scenarioDefinition.category || "Procedure",
+          date: formatDate(scenarioDateTime),
+          time: formatTime(scenarioDateTime),
+          lot: common.lot,
+          expiration: common.expiration,
+          route: scenarioDefinition.route || "",
+          site: scenarioDefinition.site,
+          dose: scenarioDefinition.dose || "N/A",
+          punctureSite: scenarioDefinition.punctureSite || "",
+          punctureDisplay: scenarioDefinition.punctureDisplay || "",
+          result: scenarioDefinition.result,
+          hideDose: Boolean(scenarioDefinition.hideDose),
+          hideSite: Boolean(scenarioDefinition.hideSite),
+          checklist: scenarioDefinition.checklist || [],
+          documentationBuilder: scenarioDefinition.documentation
+        };
+      }
+
+      function createScenarioDataAtTime(procedureName, scenarioDateTime, overrides) {
+        const definition = procedures[procedureName];
+        const common = definition.buildLot();
+        const scenarioDefinition = definition.getScenario();
+        const appliedLot = overrides && overrides.lotOverride ? overrides.lotOverride.trim() : common.lot;
+        const appliedExpiration = overrides && overrides.expirationOverride ? overrides.expirationOverride.trim() : common.expiration;
+
+        return {
+          procedure: procedureName,
+          category: scenarioDefinition.category || "Procedure",
+          date: formatDate(scenarioDateTime),
+          time: formatTime(scenarioDateTime),
+          lot: appliedLot,
+          expiration: appliedExpiration,
+          route: scenarioDefinition.route || "",
+          site: scenarioDefinition.site,
+          dose: scenarioDefinition.dose || "N/A",
+          punctureSite: scenarioDefinition.punctureSite || "",
+          punctureDisplay: scenarioDefinition.punctureDisplay || "",
+          result: scenarioDefinition.result,
+          hideDose: Boolean(scenarioDefinition.hideDose),
+          hideSite: Boolean(scenarioDefinition.hideSite),
+          checklist: scenarioDefinition.checklist || [],
+          documentationBuilder: scenarioDefinition.documentation
+        };
+      }
+
+      function buildScenarioFields(scenario) {
+        const fields = [
+          { label: "Date", value: scenario.date },
+          { label: "Time", value: scenario.time },
+          { label: scenario.category, value: scenario.procedure },
+          { label: "Lot #", value: scenario.lot },
+          { label: "Exp Date", value: scenario.expiration }
+        ];
+
+        if (scenario.route) {
+          fields.splice(2, 0, { label: "Route", value: scenario.route });
+        }
+
+        if (!scenario.hideDose) {
+          fields.splice(scenario.route ? 4 : 3, 0, { label: "Dose", value: scenario.dose });
+        }
+
+        if (!scenario.hideSite) {
+          fields.push({ label: "Site", value: scenario.site });
+        }
+
+        const punctureText = scenario.punctureDisplay || (scenario.punctureSite ? `${scenario.punctureSite} finger` : "");
+        if (punctureText) {
+          fields.push({ label: "Capillary Puncture Site", value: punctureText });
+        }
+
+        if (scenario.result !== "N/A") {
+          fields.push({ label: "Result", value: scenario.result });
+        }
+
+        return fields;
+      }
+
+      function getAdvancedDocumentationDestination(scenario) {
+        if (scenario.procedure === "Rapid Strep A" || scenario.procedure === "Mononucleosis" || scenario.procedure === "PPD") {
+          return "Care Plan";
+        }
+
+        if (scenario.route === "SQ") {
+          return "Immunization Record";
+        }
+
+        if (scenario.route === "IM") {
+          const imVaccineProcedures = ["Twinrix", "Hep A", "Hep B", "Tdap", "Influenza", "HPV", "COVID-19", "Shingrix", "Pediarix"];
+          return imVaccineProcedures.includes(scenario.procedure) ? "Immunization Record" : "Care Plan";
+        }
+
+        return "Care Plan";
+      }
+
+      function getAdvancedOrderTitle(scenario, index) {
+        return `Order ${index + 1} - ${scenario.procedure} - ${getAdvancedDocumentationDestination(scenario)}`;
+      }
+
+      function getAdvancedScenarioTitle(scenario, index) {
+        return `Order ${index + 1} - ${scenario.procedure}`;
+      }
+
+      function updateAdvancedResultsFilterButtons() {
+        advancedResultsAllBtn.classList.toggle("active", advancedResultsFilter === "all");
+        advancedResultsCarePlanBtn.classList.toggle("active", advancedResultsFilter === "care-plan");
+        advancedResultsImmunizationBtn.classList.toggle("active", advancedResultsFilter === "immunization");
+        advancedResultsPresentationAllBtn.classList.toggle("active", advancedResultsFilter === "all");
+        advancedResultsPresentationCarePlanBtn.classList.toggle("active", advancedResultsFilter === "care-plan");
+        advancedResultsPresentationImmunizationBtn.classList.toggle("active", advancedResultsFilter === "immunization");
+      }
+
+      function getFilteredAdvancedScenarios(scenarios) {
+        if (advancedResultsFilter === "care-plan") {
+          return scenarios.filter(function (scenario) {
+            return getAdvancedDocumentationDestination(scenario) === "Care Plan";
+          });
+        }
+
+        if (advancedResultsFilter === "immunization") {
+          return scenarios.filter(function (scenario) {
+            return getAdvancedDocumentationDestination(scenario) === "Immunization Record";
+          });
+        }
+
+        return scenarios;
+      }
+
+      function renderSelectedAdvancedOrders() {
+        if (!advancedSelectedProcedures.length) {
+          selectedAdvancedOrders.innerHTML = '<div class="empty-state">No doctor\'s orders loaded yet. Select a competency and load the premade order set.</div>';
+          return;
+        }
+
+        selectedAdvancedOrders.innerHTML = advancedSelectedProcedures.map(function (order, index) {
+          return `
+            <div class="selected-order">
+              <div class="index">${index + 1}</div>
+              <div class="selected-order-main">
+                <div class="name">${order.procedure}</div>
+                <div class="selected-order-overrides">
+                  <div>
+                    <label for="advancedLotOverride${index}">Lot # Override</label>
+                    <input id="advancedLotOverride${index}" type="text" value="${order.lotOverride || ""}" placeholder="Optional custom lot #" data-advanced-field="lotOverride" data-advanced-index="${index}">
+                  </div>
+                  <div>
+                    <label for="advancedExpOverride${index}">Exp Date Override</label>
+                    <input id="advancedExpOverride${index}" type="text" value="${order.expirationOverride || ""}" placeholder="Optional custom exp date" data-advanced-field="expirationOverride" data-advanced-index="${index}">
+                  </div>
+                </div>
+              </div>
+              <button class="btn-neutral" type="button" data-remove-advanced-index="${index}">Remove</button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function loadAdvancedCompetencySet() {
+        const competency = advancedCompetencySelect.value;
+
+        if (competency === "MA106") {
+          advancedSelectedProcedures = [
+            { procedure: randomChoice(imDeltoidProcedures), lotOverride: "", expirationOverride: "" },
+            { procedure: randomChoice(subcutaneousProcedures), lotOverride: "", expirationOverride: "" },
+            { procedure: "PPD", lotOverride: "", expirationOverride: "" },
+            { procedure: randomChoice(imGlutealProcedures), lotOverride: "", expirationOverride: "" }
+          ];
+        } else {
+          advancedSelectedProcedures = [
+            { procedure: "Rapid Strep A", lotOverride: "", expirationOverride: "" },
+            { procedure: "Mononucleosis", lotOverride: "", expirationOverride: "" },
+            { procedure: randomChoice(imDeltoidProcedures), lotOverride: "", expirationOverride: "" },
+            { procedure: randomChoice(subcutaneousProcedures), lotOverride: "", expirationOverride: "" },
+            { procedure: "PPD", lotOverride: "", expirationOverride: "" }
+          ];
+        }
+
+        currentAdvancedScenarios = [];
+        renderSelectedAdvancedOrders();
+        renderAdvancedOrders([]);
+        renderAdvancedResults([]);
+      }
+
+      function addAdvancedOrder() {
+        if (advancedSelectedProcedures.length >= 6) {
+          advancedOrdersOutput.className = "empty-state";
+          advancedOrdersOutput.innerHTML = "You can include up to six orders in the advanced set.";
+          return;
+        }
+
+        advancedSelectedProcedures.push({
+          procedure: advancedProcedureSelect.value,
+          lotOverride: "",
+          expirationOverride: ""
+        });
+
+        currentAdvancedScenarios = [];
+        renderSelectedAdvancedOrders();
+        renderAdvancedOrders([]);
+        renderAdvancedResults([]);
+      }
+
+      function renderAdvancedOrders(scenarios) {
+        if (!scenarios.length) {
+          advancedOrdersOutput.className = "empty-state";
+          advancedOrdersOutput.innerHTML = "Generate an advanced set to display up to six charting orders for students.";
+          advancedPresentationBody.innerHTML = '<div class="empty-state">Generate an advanced set to display it in presentation view.</div>';
+          return;
+        }
+
+        advancedOrdersOutput.className = "advanced-grid";
+        const markup = scenarios.map(function (scenario, index) {
+          const fields = buildScenarioFields(scenario);
+          return `
+            <article class="advanced-order-card">
+              <div class="advanced-order-header">
+                <h3>${getAdvancedScenarioTitle(scenario, index)}</h3>
+                <span class="advanced-order-type">${scenario.category}</span>
+              </div>
+              <div class="advanced-order-grid">
+                ${fields.map(function (field) {
+                  return `
+                    <div class="advanced-order-item">
+                      <span class="label">${field.label}</span>
+                      <div class="value">${field.value}</div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </article>
+          `;
+        }).join("");
+        advancedOrdersOutput.innerHTML = markup;
+        const compactClass = scenarios.length >= 5 ? " compact" : "";
+        advancedPresentationBody.innerHTML = `<div class="advanced-presentation-grid${compactClass}">${markup}</div>`;
+      }
+
+      function renderAdvancedResults(scenarios) {
+        updateAdvancedResultsFilterButtons();
+
+        if (!scenarios.length) {
+          advancedResultsOutput.className = "empty-state";
+          advancedResultsOutput.innerHTML = "Generate an advanced set to populate the documentation results reference tab.";
+          advancedResultsPresentationBody.innerHTML = '<div class="empty-state">Generate an advanced set to display the documentation results in presentation view.</div>';
+          return;
+        }
+
+        const filteredScenarios = getFilteredAdvancedScenarios(scenarios);
+
+        if (!filteredScenarios.length) {
+          advancedResultsOutput.className = "empty-state";
+          advancedResultsOutput.innerHTML = "No documentation results match the selected filter for this advanced set.";
+          advancedResultsPresentationBody.innerHTML = '<div class="empty-state">No documentation results match the selected filter for this advanced set.</div>';
+          return;
+        }
+
+        const resultsMarkup = filteredScenarios.map(function (scenario, index) {
+          const lotExp = `Lot#-${scenario.lot} / Exp-${scenario.expiration}`;
+          const documentationText = scenario.documentationBuilder({
+            date: scenario.date,
+            time: scenario.time,
+            lotExp: lotExp
+          });
+
+          return `
+            <article class="advanced-result-card">
+              <h3>${getAdvancedOrderTitle(scenario, index)}</h3>
+              <div class="advanced-result-meta">${scenario.date} at ${scenario.time}</div>
+              <div class="advanced-result-text">${documentationText}</div>
+            </article>
+          `;
+        }).join("");
+
+        advancedResultsOutput.className = "advanced-results-grid";
+        advancedResultsOutput.innerHTML = resultsMarkup;
+        advancedResultsPresentationBody.innerHTML = `<div class="advanced-results-presentation">${resultsMarkup}</div>`;
+      }
+
+      function syncPresentationScenario() {
+        if (!currentScenario) {
+          presentationScenario.innerHTML = '<div class="empty-state">Generate a scenario to display it in presentation view.</div>';
+          return;
+        }
+
+        const clonedContent = scenarioContent.cloneNode(true);
+        const banner = clonedContent.querySelector(".scenario-banner");
+        if (banner) {
+          banner.remove();
+        }
+        presentationScenario.innerHTML = clonedContent.innerHTML;
+      }
+
+      function syncDocumentationPresentation() {
+        documentationPresentationBody.textContent = documentationOutput.textContent.trim() || "Generate correct documentation to display it in presentation view.";
+      }
+
+      function stopIntervals() {
+        clearInterval(clockTicker);
+        clockTicker = null;
+      }
+
+      function tickClocks() {
+        if (!clocksRunning || !runStartedAtMs) {
+          return;
+        }
+
+        const elapsedMs = Date.now() - runStartedAtMs;
+        const currentStopwatchMs = stopwatchElapsedMs + elapsedMs;
+        const currentCountdownMs = Math.max(0, countdownRemainingMs - elapsedMs);
+
+        stopwatchSeconds = Math.floor(currentStopwatchMs / 1000);
+        countdownSeconds = currentCountdownMs > 0 ? Math.ceil(currentCountdownMs / 1000) : 0;
+
+        if (currentCountdownMs === 0) {
+          clockStatus.textContent = "Countdown complete. Stopwatch continues until paused or reset.";
+        }
+
+        updateClockDisplays();
+      }
+
+      function runClocks() {
+        if (clocksRunning) {
+          clockStatus.textContent = "Clocks are already running.";
+          return;
+        }
+        stopIntervals();
+        clocksRunning = true;
+        runStartedAtMs = Date.now();
+        clockStatus.textContent = "Clocks are running.";
+        tickClocks();
+        clockTicker = setInterval(tickClocks, 200);
+      }
+
+      function resetClocks() {
+        stopIntervals();
+        clocksRunning = false;
+        runStartedAtMs = 0;
+        countdownRemainingMs = selectedTimerMinutes * 60 * 1000;
+        stopwatchElapsedMs = 0;
+        countdownSeconds = countdownRemainingMs > 0 ? Math.ceil(countdownRemainingMs / 1000) : 0;
+        stopwatchSeconds = 0;
+        updateClockDisplays();
+        clockStatus.textContent = "Clocks reset and ready.";
+      }
+
+      function pauseClocks() {
+        if (!clocksRunning) {
+          clockStatus.textContent = "Clocks are already paused.";
+          return;
+        }
+        const elapsedMs = Date.now() - runStartedAtMs;
+        stopwatchElapsedMs += elapsedMs;
+        countdownRemainingMs = Math.max(0, countdownRemainingMs - elapsedMs);
+        stopIntervals();
+        clocksRunning = false;
+        runStartedAtMs = 0;
+        countdownSeconds = countdownRemainingMs > 0 ? Math.ceil(countdownRemainingMs / 1000) : 0;
+        stopwatchSeconds = Math.floor(stopwatchElapsedMs / 1000);
+        updateClockDisplays();
+        clockStatus.textContent = "Clocks paused.";
+      }
+
+      function resumeClocks() {
+        if (clocksRunning) {
+          clockStatus.textContent = "Clocks are already running.";
+          return;
+        }
+        if (!currentScenario) {
+          clockStatus.textContent = "Generate a scenario before starting the clocks.";
+          return;
+        }
+        runClocks();
+      }
+
+      function buildScenario() {
+        const procedureName = procedureSelect.value;
+        const definition = procedures[procedureName];
+        currentScenario = createScenarioData(procedureName);
+
+        renderScenario();
+        instructorPrompt.textContent = definition.prompt;
+        documentationOutput.textContent = "Correct charting will appear here after you click Generate Correct Documentation.";
+        copyStatus.textContent = "";
+        evaluationContent.textContent = "Enter student documentation, then click Evaluate Student Documentation to check for key charting elements.";
+        generateDocumentationBtn.disabled = false;
+        evaluateDocumentationBtn.disabled = false;
+        lockCopy();
+        resetClocks();
+        clockStatus.textContent = "Scenario ready. Press Start when you want the timer and stopwatch to begin.";
+      }
+
+      function renderScenario() {
+        if (!currentScenario) {
+          scenarioContent.className = "empty-state";
+          scenarioContent.innerHTML = 'Scenario details will appear here after you click <strong>Generate Scenario</strong>.';
+          syncPresentationScenario();
+          return;
+        }
+
+        const fields = buildScenarioFields(currentScenario);
+
+        scenarioContent.className = "";
+        scenarioContent.innerHTML = `
+          <div class="scenario-banner">Display these details for students, then have them build a concise charting statement using standard abbreviations, the correct sequence, and professional sentence-style documentation.</div>
+          <div class="scenario-grid">
+            ${fields.map(function (field) {
+              return `
+                <div class="data-item">
+                  <span class="label">${field.label}</span>
+                  <div class="value">${field.value}</div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+        syncPresentationScenario();
+      }
+
+      function generateDocumentation() {
+        if (!currentScenario) {
+          return;
+        }
+        const lotExp = `Lot#-${currentScenario.lot} / Exp-${currentScenario.expiration}`;
+        const text = currentScenario.documentationBuilder({
+          date: currentScenario.date,
+          time: currentScenario.time,
+          lotExp: lotExp
+        });
+        documentationOutput.textContent = text;
+        syncDocumentationPresentation();
+        copyDocumentationBtn.disabled = !copyUnlocked;
+        copyStatus.textContent = "Correct documentation generated.";
+      }
+
+      function unlockCopy() {
+        if (copyPasswordInput.value === copyPassword) {
+          copyUnlocked = true;
+          copyPasswordStatus.textContent = "Password accepted. Copy Documentation is unlocked.";
+          if (documentationOutput.textContent.trim() && documentationOutput.textContent.indexOf("Correct charting will appear here") !== 0) {
+            copyDocumentationBtn.disabled = false;
+          }
+        } else {
+          copyUnlocked = false;
+          copyDocumentationBtn.disabled = true;
+          copyPasswordStatus.textContent = "Incorrect password. Copy remains locked.";
+        }
+      }
+
+      function evaluateDocumentation() {
+        if (!currentScenario) {
+          evaluationContent.textContent = "Generate a scenario before evaluating documentation.";
+          return;
+        }
+
+        const text = studentNotes.value.trim().toLowerCase();
+        if (!text) {
+          evaluationContent.textContent = "Enter student documentation before running the checklist.";
+          return;
+        }
+
+        const normalizedText = text.replace(/\u2013/g, "-").replace(/\u2014/g, "-");
+        const dateMatch = normalizedText.includes(currentScenario.date.toLowerCase());
+        const timeMatch = normalizedText.includes(currentScenario.time.toLowerCase());
+
+        const results = currentScenario.checklist.map(function (item) {
+          let passed;
+          if (item.label === "Date included") {
+            passed = dateMatch;
+          } else if (item.label === "Time included") {
+            passed = timeMatch;
+          } else if (item.anyMatch) {
+            passed = item.anyMatch.some(function (term) {
+              return normalizedText.includes(term.toLowerCase());
+            });
+          } else {
+            passed = item.match.every(function (term) {
+              return normalizedText.includes(term.toLowerCase());
+            });
+          }
+          return { label: item.label, passed: passed };
+        });
+
+        const passedCount = results.filter(function (item) {
+          return item.passed;
+        }).length;
+
+        evaluationContent.innerHTML = `
+          <div class="evaluation-summary">${passedCount} of ${results.length} checklist items detected.</div>
+          <ul class="evaluation-list">
+            ${results.map(function (item) {
+              return `<li class="${item.passed ? "pass" : "miss"}">${item.passed ? "Checked" : "Missing"}: ${item.label}</li>`;
+            }).join("")}
+          </ul>
+        `;
+      }
+
+      function copyDocumentation() {
+        const text = documentationOutput.textContent.trim();
+        if (!text || text.indexOf("Correct charting will appear here") === 0) {
+          copyStatus.textContent = "Generate documentation before copying.";
+          return;
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(function () {
+            copyStatus.textContent = "Documentation copied to clipboard.";
+          }).catch(function () {
+            fallbackCopy(text);
+          });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        temp.setAttribute("readonly", "");
+        temp.style.position = "absolute";
+        temp.style.left = "-9999px";
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+          document.execCommand("copy");
+          copyStatus.textContent = "Documentation copied to clipboard.";
+        } catch (error) {
+          copyStatus.textContent = "Copy failed. Please select and copy manually.";
+        }
+        document.body.removeChild(temp);
+      }
+
+      documentationOutput.addEventListener("copy", function (event) {
+        event.preventDefault();
+        copyStatus.textContent = "Direct copying from the Correct Documentation area is disabled.";
+      });
+
+      documentationOutput.addEventListener("cut", function (event) {
+        event.preventDefault();
+        copyStatus.textContent = "Cutting from the Correct Documentation area is disabled.";
+      });
+
+      documentationOutput.addEventListener("dragstart", function (event) {
+        event.preventDefault();
+      });
+
+      function resetAll() {
+        currentScenario = null;
+        renderScenario();
+        instructorPrompt.textContent = "Generate a scenario, ask students to document the procedure independently, then reveal the correct charting format for comparison.";
+        documentationOutput.textContent = "Correct charting will appear here after a scenario is generated and you click the button above.";
+        syncDocumentationPresentation();
+        studentNotes.value = "";
+        copyStatus.textContent = "";
+        evaluationContent.textContent = "Generate a scenario and enter student documentation to evaluate whether the key charting elements are present.";
+        generateDocumentationBtn.disabled = true;
+        evaluateDocumentationBtn.disabled = true;
+        lockCopy();
+        resetClocks();
+        clockStatus.textContent = "Everything has been reset.";
+      }
+
+      function openPresentation() {
+        presentationOverlay.classList.add("open");
+        presentationOverlay.setAttribute("aria-hidden", "false");
+        syncPresentationScenario();
+      }
+
+      function closePresentation() {
+        presentationOverlay.classList.remove("open");
+        presentationOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function openDocumentationPresentation() {
+        documentationPresentationOverlay.classList.add("open");
+        documentationPresentationOverlay.setAttribute("aria-hidden", "false");
+        syncDocumentationPresentation();
+      }
+
+      function closeDocumentationPresentation() {
+        documentationPresentationOverlay.classList.remove("open");
+        documentationPresentationOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function startClocks() {
+        if (!currentScenario) {
+          clockStatus.textContent = "Generate a scenario before starting the clocks.";
+          return;
+        }
+        runClocks();
+      }
+
+      function clearAdvancedOrders() {
+        advancedSelectedProcedures = [];
+        currentAdvancedScenarios = [];
+        renderSelectedAdvancedOrders();
+        renderAdvancedOrders([]);
+        renderAdvancedResults([]);
+        resetAdvancedClocks();
+        resetAdvancedResultsClocks();
+      }
+
+      function generateAdvancedOrders() {
+        if (!advancedSelectedProcedures.length) {
+          currentAdvancedScenarios = [];
+          renderAdvancedOrders([]);
+          renderAdvancedResults([]);
+          return;
+        }
+
+        resetAdvancedClocks();
+        resetAdvancedResultsClocks();
+
+        const baseTime = getScenarioDateTime();
+        const scenarios = [];
+        let runningTime = new Date(baseTime);
+
+        advancedSelectedProcedures.forEach(function (order, index) {
+          if (index > 0) {
+            runningTime = new Date(runningTime.getTime() + randomInt(1, 2) * 60000);
+          }
+          scenarios.push(createScenarioDataAtTime(order.procedure, new Date(runningTime), order));
+        });
+
+        currentAdvancedScenarios = scenarios;
+        renderAdvancedOrders(scenarios);
+        renderAdvancedResults(scenarios);
+      }
+
+      function openAdvancedPresentation() {
+        advancedPresentationOverlay.classList.add("open");
+        advancedPresentationOverlay.setAttribute("aria-hidden", "false");
+        updateClockDisplays();
+      }
+
+      function closeAdvancedPresentation() {
+        advancedPresentationOverlay.classList.remove("open");
+        advancedPresentationOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function openAdvancedResultsPresentation() {
+        advancedResultsPresentationOverlay.classList.add("open");
+        advancedResultsPresentationOverlay.setAttribute("aria-hidden", "false");
+      }
+
+      function closeAdvancedResultsPresentation() {
+        advancedResultsPresentationOverlay.classList.remove("open");
+        advancedResultsPresentationOverlay.setAttribute("aria-hidden", "true");
+      }
+
+      function setAdvancedResultsFilter(filterValue) {
+        advancedResultsFilter = filterValue;
+        renderAdvancedResults(currentAdvancedScenarios);
+      }
+
+      function openAdvancedPrintPreview() {
+        const presentationGrid = advancedPresentationBody.querySelector(".advanced-presentation-grid");
+        if (!presentationGrid) {
+          return;
+        }
+
+        const styleTag = document.querySelector("style");
+        const styleText = styleTag ? styleTag.textContent : "";
+        const theme = document.body.getAttribute("data-theme") || "light";
+        const compactClass = presentationGrid.classList.contains("compact") ? " compact" : "";
+        const previewWindow = window.open("", "_blank", "width=1500,height=950");
+
+        if (!previewWindow) {
+          return;
+        }
+
+        previewWindow.document.open();
+        previewWindow.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Orders Print Preview</title>
+  <style>${styleText}</style>
+  <style>
+    body {
+      min-height: 100vh;
+    }
+
+    .print-preview-shell {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .print-preview-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .print-preview-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .print-preview-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .print-preview-orders {
+      width: 100%;
+    }
+
+    .print-sheet {
+      width: 10.2in;
+      min-height: 7.05in;
+      margin: 0 auto;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .print-fit-stage {
+      width: 100%;
+      transform-origin: top left;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+      }
+
+      .print-preview-shell {
+        max-width: none;
+        padding: 0;
+      }
+
+      .print-preview-toolbar {
+        display: none !important;
+      }
+
+      .print-sheet {
+        width: 10.2in;
+        min-height: 7.05in;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body data-theme="${theme}">
+  <main class="print-preview-shell">
+    <div class="print-preview-toolbar">
+      <div class="print-preview-title">Advanced Orders</div>
+      <div class="print-preview-actions">
+        <button class="btn-primary" type="button" onclick="window.print()">Print / Save PDF</button>
+        <button class="btn-neutral" type="button" onclick="window.close()">Close</button>
+      </div>
+    </div>
+    <div class="print-preview-orders">
+      <div class="print-sheet">
+        <div id="printFitStage" class="print-fit-stage">
+          <div class="advanced-presentation-grid${compactClass}">${presentationGrid.innerHTML}</div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    (function () {
+      function fitAdvancedOrders() {
+        var sheet = document.querySelector(".print-sheet");
+        var stage = document.getElementById("printFitStage");
+        if (!sheet || !stage) {
+          return;
+        }
+
+        stage.style.transform = "scale(1)";
+        stage.style.width = "100%";
+
+        var availableWidth = sheet.clientWidth - 8;
+        var availableHeight = sheet.clientHeight - 8;
+        var neededWidth = stage.scrollWidth;
+        var neededHeight = stage.scrollHeight;
+        var widthScale = availableWidth / neededWidth;
+        var heightScale = availableHeight / neededHeight;
+        var scale = Math.min(widthScale, heightScale, 1) * 0.94;
+
+        stage.style.width = neededWidth + "px";
+        stage.style.transform = "scale(" + scale + ")";
+        sheet.style.height = Math.ceil(neededHeight * scale) + "px";
+      }
+
+      window.addEventListener("load", fitAdvancedOrders);
+      window.addEventListener("resize", fitAdvancedOrders);
+      window.addEventListener("beforeprint", fitAdvancedOrders);
+    })();
+  <\/script>
+</body>
+</html>`);
+        previewWindow.document.close();
+        previewWindow.focus();
+      }
+
+      function openAdvancedResultsPrintPreview() {
+        const resultsGrid = advancedResultsOutput.classList.contains("advanced-results-grid") ? advancedResultsOutput : null;
+        if (!resultsGrid) {
+          return;
+        }
+
+        const styleTag = document.querySelector("style");
+        const styleText = styleTag ? styleTag.textContent : "";
+        const theme = document.body.getAttribute("data-theme") || "light";
+        const previewWindow = window.open("", "_blank", "width=1500,height=950");
+
+        if (!previewWindow) {
+          return;
+        }
+
+        previewWindow.document.open();
+        previewWindow.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Documentation Results Print Preview</title>
+  <style>${styleText}</style>
+  <style>
+    body {
+      min-height: 100vh;
+    }
+
+    .print-preview-shell {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .print-preview-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .print-preview-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .print-preview-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+      }
+
+      .print-preview-shell {
+        max-width: none;
+        padding: 0;
+      }
+
+      .print-preview-toolbar {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body data-theme="${theme}">
+  <main class="print-preview-shell">
+    <div class="print-preview-toolbar">
+      <div class="print-preview-title">Advanced Documentation Results</div>
+      <div class="print-preview-actions">
+        <button class="btn-primary" type="button" onclick="window.print()">Print / Save PDF</button>
+        <button class="btn-neutral" type="button" onclick="window.close()">Close</button>
+      </div>
+    </div>
+    <div class="advanced-results-grid">${resultsGrid.innerHTML}</div>
+  </main>
+</body>
+</html>`);
+        previewWindow.document.close();
+        previewWindow.focus();
+      }
+
+      generateScenarioBtn.addEventListener("click", buildScenario);
+      beginnerTabBtn.addEventListener("click", function () { setActiveTab("beginner"); });
+      advancedTabBtn.addEventListener("click", function () { setActiveTab("advanced"); });
+      advancedResultsTabBtn.addEventListener("click", function () { setActiveTab("advanced-results"); });
+      addAdvancedOrderBtn.addEventListener("click", addAdvancedOrder);
+      loadAdvancedCompetencyBtn.addEventListener("click", loadAdvancedCompetencySet);
+      resetAdvancedBuilderBtn.addEventListener("click", clearAdvancedOrders);
+      generateAdvancedOrdersBtn.addEventListener("click", generateAdvancedOrders);
+      advancedResultsAllBtn.addEventListener("click", function () { setAdvancedResultsFilter("all"); });
+      advancedResultsCarePlanBtn.addEventListener("click", function () { setAdvancedResultsFilter("care-plan"); });
+      advancedResultsImmunizationBtn.addEventListener("click", function () { setAdvancedResultsFilter("immunization"); });
+      advancedResultsPresentationAllBtn.addEventListener("click", function () { setAdvancedResultsFilter("all"); });
+      advancedResultsPresentationCarePlanBtn.addEventListener("click", function () { setAdvancedResultsFilter("care-plan"); });
+      advancedResultsPresentationImmunizationBtn.addEventListener("click", function () { setAdvancedResultsFilter("immunization"); });
+      clearAdvancedOrdersBtn.addEventListener("click", clearAdvancedOrders);
+      openAdvancedPresentationBtn.addEventListener("click", openAdvancedPresentation);
+      openAdvancedPrintPreviewBtn.addEventListener("click", openAdvancedPrintPreview);
+      openAdvancedResultsPresentationBtn.addEventListener("click", openAdvancedResultsPresentation);
+      openAdvancedResultsPrintPreviewBtn.addEventListener("click", openAdvancedResultsPrintPreview);
+      closeAdvancedPresentationBtn.addEventListener("click", closeAdvancedPresentation);
+      closeAdvancedResultsPresentationBtn.addEventListener("click", closeAdvancedResultsPresentation);
+      advancedPresentationStartBtn.addEventListener("click", startAdvancedClocks);
+      advancedPresentationPauseBtn.addEventListener("click", pauseAdvancedClocks);
+      advancedPresentationResumeBtn.addEventListener("click", startAdvancedClocks);
+      advancedPresentationResetBtn.addEventListener("click", resetAdvancedClocks);
+      advancedPresentationStopwatchMinusBtn.addEventListener("click", function () {
+        adjustAdvancedCountdownByMinutes(-1);
+      });
+      advancedPresentationStopwatchPlusBtn.addEventListener("click", function () {
+        adjustAdvancedCountdownByMinutes(1);
+      });
+      advancedResultsPresentationStartBtn.addEventListener("click", startAdvancedResultsClocks);
+      advancedResultsPresentationPauseBtn.addEventListener("click", pauseAdvancedResultsClocks);
+      advancedResultsPresentationResumeBtn.addEventListener("click", startAdvancedResultsClocks);
+      advancedResultsPresentationResetBtn.addEventListener("click", resetAdvancedResultsClocks);
+      advancedResultsPresentationStopwatchMinusBtn.addEventListener("click", function () {
+        adjustAdvancedResultsCountdownByMinutes(-1);
+      });
+      advancedResultsPresentationStopwatchPlusBtn.addEventListener("click", function () {
+        adjustAdvancedResultsCountdownByMinutes(1);
+      });
+      mainMinusMinuteBtn.addEventListener("click", function () {
+        adjustCountdownByMinutes(-1);
+      });
+      mainPlusMinuteBtn.addEventListener("click", function () {
+        adjustCountdownByMinutes(1);
+      });
+      evaluateDocumentationBtn.addEventListener("click", evaluateDocumentation);
+      startBtn.addEventListener("click", startClocks);
+      generateDocumentationBtn.addEventListener("click", generateDocumentation);
+      copyDocumentationBtn.addEventListener("click", copyDocumentation);
+      unlockCopyBtn.addEventListener("click", unlockCopy);
+      resetAllBtn.addEventListener("click", resetAll);
+      pauseBtn.addEventListener("click", pauseClocks);
+      resumeBtn.addEventListener("click", resumeClocks);
+      resetClocksBtn.addEventListener("click", resetClocks);
+      lightThemeBtn.addEventListener("click", function () { setTheme("light"); });
+      darkThemeBtn.addEventListener("click", function () { setTheme("dark"); });
+      openPresentationBtn.addEventListener("click", openPresentation);
+      openDocumentationPresentationBtn.addEventListener("click", openDocumentationPresentation);
+      closePresentationBtn.addEventListener("click", closePresentation);
+      presentationStartBtn.addEventListener("click", startClocks);
+      presentationPauseBtn.addEventListener("click", pauseClocks);
+      presentationResumeBtn.addEventListener("click", resumeClocks);
+      presentationResetBtn.addEventListener("click", resetClocks);
+      presentationMinusMinuteBtn.addEventListener("click", function () {
+        adjustCountdownByMinutes(-1);
+      });
+      presentationPlusMinuteBtn.addEventListener("click", function () {
+        adjustCountdownByMinutes(1);
+      });
+      closeDocumentationPresentationBtn.addEventListener("click", closeDocumentationPresentation);
+      documentationPresentationStartBtn.addEventListener("click", startClocks);
+      documentationPresentationPauseBtn.addEventListener("click", pauseClocks);
+      documentationPresentationResumeBtn.addEventListener("click", resumeClocks);
+      documentationPresentationResetBtn.addEventListener("click", resetClocks);
+      documentationPresentationMinusMinuteBtn.addEventListener("click", function () {
+        adjustCountdownByMinutes(-1);
+      });
+      documentationPresentationPlusMinuteBtn.addEventListener("click", function () {
+        adjustCountdownByMinutes(1);
+      });
+      presentationOverlay.addEventListener("click", function (event) {
+        if (event.target === presentationOverlay) {
+          closePresentation();
+        }
+      });
+      documentationPresentationOverlay.addEventListener("click", function (event) {
+        if (event.target === documentationPresentationOverlay) {
+          closeDocumentationPresentation();
+        }
+      });
+      advancedPresentationOverlay.addEventListener("click", function (event) {
+        if (event.target === advancedPresentationOverlay) {
+          closeAdvancedPresentation();
+        }
+      });
+      advancedResultsPresentationOverlay.addEventListener("click", function (event) {
+        if (event.target === advancedResultsPresentationOverlay) {
+          closeAdvancedResultsPresentation();
+        }
+      });
+      selectedAdvancedOrders.addEventListener("click", function (event) {
+        const removeIndex = event.target.getAttribute("data-remove-advanced-index");
+        if (removeIndex === null) {
+          return;
+        }
+        advancedSelectedProcedures.splice(Number(removeIndex), 1);
+        renderSelectedAdvancedOrders();
+        generateAdvancedOrders();
+      });
+      selectedAdvancedOrders.addEventListener("input", function (event) {
+        const index = event.target.getAttribute("data-advanced-index");
+        const field = event.target.getAttribute("data-advanced-field");
+        if (index === null || !field || !advancedSelectedProcedures[Number(index)]) {
+          return;
+        }
+        advancedSelectedProcedures[Number(index)][field] = event.target.value;
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && presentationOverlay.classList.contains("open")) {
+          closePresentation();
+        }
+        if (event.key === "Escape" && documentationPresentationOverlay.classList.contains("open")) {
+          closeDocumentationPresentation();
+        }
+        if (event.key === "Escape" && advancedPresentationOverlay.classList.contains("open")) {
+          closeAdvancedPresentation();
+        }
+        if (event.key === "Escape" && advancedResultsPresentationOverlay.classList.contains("open")) {
+          closeAdvancedResultsPresentation();
+        }
+      });
+
+      updateClockDisplays();
+      setTheme("light");
+      setActiveTab("beginner");
+      lockCopy();
+      syncDocumentationPresentation();
+      resetAdvancedClocks();
+      resetAdvancedResultsClocks();
+      renderSelectedAdvancedOrders();
+      renderAdvancedOrders([]);
+      renderAdvancedResults([]);
+      updateAdvancedResultsFilterButtons();
+      clockStatus.textContent = "Select a procedure and generate a scenario to begin.";
+    })();
+  </script>
+</body>
+</html>
